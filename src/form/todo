@@ -1,0 +1,17 @@
+more actions
+action={finishTyping} < more of these
+wait={500}
+do={func}
+try do this in a HOC if possible
+
+more validators
+
+onload (with errors from past attempt- ajax should hnadle this tbh)
+
+add custom h1s and props that requite a prop like ignore so the form children loop ignores it
+
+
+fileupload separate by files
+fileupload show uploading status
+fileupload show file format and preview if possible
+fileupload have max size validator or individual size validator
