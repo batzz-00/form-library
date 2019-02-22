@@ -39,7 +39,6 @@ class FileUpload extends React.Component {
           return new Promise((resolve, reject) => {
             image.onload = i => {
               resolve({ id: result.id, img: image })
-              console.log('kek')
             }
             image.src = result.base64
           })
@@ -59,7 +58,6 @@ class FileUpload extends React.Component {
   }
   imageLoaded (image) {
     let files = this.state.files.slice() // might be undefined but file is always defined so no error? maybe catch hmm
-    console.log(image)
     files.filter(file => file.id).forEach(file => {
       if (file.id === image.id) {
         file.image = image.img
@@ -115,5 +113,5 @@ FileUpload.propTypes = {
   handleChange: PropTypes.func,
   errors: PropTypes.array,
   checkErrors: PropTypes.func,
-  multiple: PropTypes.boolean
+  multiple: PropTypes.bool
 }
