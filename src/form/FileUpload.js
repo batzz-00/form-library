@@ -24,36 +24,7 @@ class FileUpload extends React.Component {
   }
   handleChange () {
     let actualFiles = Object.keys(this.fileInput.current.files).map(file => { if (file !== 'length') { return this.fileInput.current.files[file] } })
-    let files = []
-    actualFiles.forEach(file => {
-      let isImage = file.type.split('/')[0] === 'image'
-      let f = {}
-      if (isImage) {
-        const fr = new FileReader()
-        let imageID = Math.random().toString(11).replace('0.', '')
-        f.id = imageID
-        new Promise((resolve, reject) => {
-          fr.onload = (e) => { resolve({ id: imageID, base64: e.target.result }); console.log(e) }
-        }).then(result => {
-          let image = new Image()
-          return new Promise((resolve, reject) => {
-            image.onload = i => {
-              resolve({ id: result.id, img: image })
-            }
-            image.src = result.base64
-          })
-        }).then(image => {
-          this.imageLoaded(image)
-        }).catch(err => {
-          console.log('file loading failed: ' + err.message)
-        })
-        fr.readAsDataURL(file)
-      }
-      f.name = file.name
-      f.type = file.type
-      f.size = file.size
-      files.push(f)
-    })
+    let files = actualFiles
     this.setState({ files })
   }
   imageLoaded (image) {
@@ -66,9 +37,8 @@ class FileUpload extends React.Component {
     this.setState({ files: files })
   }
   render () {
-    const { title, name, placeholder, value, errors, multiple } = this.props
+    const { title, name, value, errors, multiple } = this.props
     const { files } = this.state
-    console.log(placeholder)
     return (
       <div className='input-wrapper'>
         <div className={'input' + (errors ? ' error' : '')}>
@@ -87,8 +57,8 @@ class FileUpload extends React.Component {
                 {files.map((file, i) => {
                   return (
                     <FilePreview
+                      file={file}
                       key={i}
-                      {...file}
                     />)
                 })}
               </React.Fragment>
@@ -107,10 +77,8 @@ export default FileUpload
 
 FileUpload.propTypes = {
   title: PropTypes.string,
-  placeholder: PropTypes.string,
   name: PropTypes.string,
   value: PropTypes.string,
-  handleChange: PropTypes.func,
   errors: PropTypes.array,
   checkErrors: PropTypes.func,
   multiple: PropTypes.bool
