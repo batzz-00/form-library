@@ -57,7 +57,9 @@
     ],
     "parser": "babel-eslint",
     "globals": {
-      "localStorage": true
+      "localStorage": true,
+      "FileReader": true,
+      "Image": true
     }
   },
   "babel": {

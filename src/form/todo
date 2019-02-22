@@ -12,6 +12,6 @@ add custom h1s and props that requite a prop like ignore so the form children lo
 
 
 fileupload separate by files
-fileupload show uploading status
-fileupload show file format and preview if possible
-fileupload have max size validator or individual size validator
+show uploading status
+show file format and preview if possible
+have max size validator or individual size validator
