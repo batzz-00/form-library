@@ -9,69 +9,71 @@ export default class FilePreview extends React.Component {
     super(props)
     this.state = {
       imageSize: {},
-      loading: null
+      image: null,
+      loading: true
     }
     this.fileDetails = React.createRef()
     this.imageWrapper = React.createRef()
-    this.loadFile(props.file)
     window.addEventListener('resize', (e) => {
       this.render()
     })
   }
-  loadFile (image) {
-    console.log('LOADER')
-    let isImage = image.type.split('/')[0] === 'image'
+  componentDidMount () {
+    this.loadFile(this.props.file)
+  }
+  componentWillUnmount () {
+  }
+  loadFile (file) {
+    let isImage = file.type.split('/')[0] === 'image'
     let f = {}
-    if (isImage) {
-
-    }
     const fr = new FileReader()
-    let imageID = Math.random().toString(11).replace('0.', '')
-    f.id = imageID
-    let file = new Promise((resolve, reject) => {
-      console.log('batch')
+    let fileReader = new Promise((resolve, reject) => {
       fr.onprogress = (e) => {
         if (e.loaded === e.total) {
-          this.setState({ loading: null })
+          this.setState({ loading: false })
         } else {
           this.setState({ loading: ((e.loaded / e.total) * 100) })
         }
       }
-      fr.onload = (e) => { resolve({ id: imageID, base64: e.target.result }); console.log(e) }
+      fr.onload = (e) => { resolve(e.target.result); console.log(e) }
     })
-    fr.readAsDataURL(image)
+    fr.readAsDataURL(file)
     if (isImage) {
-      file.then(result => {
+      fileReader.then(result => {
         let image = new Image()
-        console.log('batch')
+        let imageID = Math.random().toString(11).replace('0.', '')
+        f.id = imageID
         return new Promise((resolve, reject) => {
           image.onload = i => {
-            resolve({ id: result.id, img: image })
+            resolve({ id: imageID, img: image })
           }
-          image.src = result.base64
+          image.src = result
         })
       }).then(image => {
-        // this.imageLoaded(image)
+        console.log(image)
+        this.setState({ image: image.img })
       }).catch(err => {
         console.log('file loading failed: ' + err.message)
       })
     }
-    f.name = image.name
-    f.type = image.type
-    f.size = image.size
+    f.name = file.name
+    f.type = file.type
+    f.format = file.type.split('/')[file.type.split('/').length - 1]
+    f.size = (file.size / 1000000 < 1 ? file.size / 1000 : file.size / 1000000).toFixed(2)
+    f.sizeFormat = file.size / 1000000 < 1 ? 'KB' : 'MB'
     this.setState({ file: f })
   }
   render () {
-    console.log(this.state.loading)
-    const { imageSize, loading, name, image } = this.state
-    // THIS IS HOPING an IMAGE ISNT SUPPLIED WHEN THE COMPONENT IS CREATED ELSE THE REFS WONT BE MOUNTED, NEED TO FIND A FIX
+    const { imageSize, loading, file, image } = this.state
     return (
       <div className='file-wrapper'>
-        <div className='file-details' ref={this.fileDetails}>
-          <h1>{name}</h1>
-          {image ? <div className='image-wrapper' ref={this.imageWrapper}><div className='image' style={{ backgroundImage: `url('${image.src}')`, ...imageSize }} /></div> : null}
-          {loading ? <div className='progress-bar'><div className='bar' style={{ width: this.state.loading + '%' }} /></div> : null }
-        </div>
+        { loading === false
+          ? <div className='file-details' ref={this.fileDetails}>
+            <h1>{file.name}</h1>
+            <h2>{`${file.size} ${file.sizeFormat}`}</h2>
+          </div> : null }
+        {image ? <div className='image-wrapper' ref={this.imageWrapper}><div className='image' style={{ backgroundImage: `url('${image.src}')`, ...imageSize }} /></div> : null}
+        {loading ? <div className='progress-bar'><div className='bar' style={{ width: this.state.loading + '%' }} /></div> : null }
       </div>
     )
   }

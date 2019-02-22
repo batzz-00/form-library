@@ -24,21 +24,13 @@ class FileUpload extends React.Component {
   }
   handleChange () {
     let actualFiles = Object.keys(this.fileInput.current.files).map(file => { if (file !== 'length') { return this.fileInput.current.files[file] } })
-    let files = actualFiles
-    this.setState({ files })
-  }
-  imageLoaded (image) {
-    let files = this.state.files.slice() // might be undefined but file is always defined so no error? maybe catch hmm
-    files.filter(file => file.id).forEach(file => {
-      if (file.id === image.id) {
-        file.image = image.img
-      }
-    })
-    this.setState({ files: files })
+    console.log(actualFiles)
+    this.setState({ files: actualFiles })
   }
   render () {
     const { title, name, value, errors, multiple } = this.props
     const { files } = this.state
+    console.log(files)
     return (
       <div className='input-wrapper'>
         <div className={'input' + (errors ? ' error' : '')}>
