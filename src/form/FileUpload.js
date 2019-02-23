@@ -7,7 +7,7 @@ import './form.sass'
 
 // React Components
 import Errors from './Errors'
-import FilePreview from './FilePreview'
+import File from './File'
 
 class FileUpload extends React.Component {
   constructor (props) {
@@ -22,25 +22,25 @@ class FileUpload extends React.Component {
     this.fileUploadBox = React.createRef()
   }
   browseFiles (e) {
-    if (!e.target.classList.contains('select-file')) {
+    if(!e.target.classList.contains('select-file')){
       return false
     }
     this.fileInput.current.click()
   }
   handleChange () {
-    let colours = ['#2980b9', '#27ae60', '#16a085', '#d35400', '#c0392b']
+    let colours = ["#2980b9", "#27ae60", "#16a085", "#d35400", "#c0392b"]
     let actualFiles = []
     let formatColours = {}
-    for (let i in Object.keys(this.fileInput.current.files)) {
-      if (formatColours[this.fileInput.current.files.item(i).type]) {
-        actualFiles.push({ colour: formatColours[this.fileInput.current.files.item(i).type], file: this.fileInput.current.files.item(i) })
+    for(let i in Object.keys(this.fileInput.current.files)){
+      if(formatColours[this.fileInput.current.files.item(i).type]){
+        actualFiles.push({colour: formatColours[this.fileInput.current.files.item(i).type], file: this.fileInput.current.files.item(i)})
       } else {
         let colour = colours.splice(0, 1)[0]
         formatColours[this.fileInput.current.files.item(i).type] = colour
-        actualFiles.push({ colour, file: this.fileInput.current.files.item(i) })
+        actualFiles.push({colour, file: this.fileInput.current.files.item(i)})
       }
     }
-    // let files = Object.keys(this.fileInput.current.files).map((file, i) =>
+    // let files = Object.keys(this.fileInput.current.files).map((file, i) => 
     //   {
     //     // if(file === "length")
     //     console.log(file)
@@ -52,12 +52,12 @@ class FileUpload extends React.Component {
     // same ref? fixed by using componentdidupdate, somehow got some additional efficiency lol
 
     // note
-    // upload logic is in filepreview
+    //upload logic is in filepreview 
   }
-  uploadComplete (idx) {
+  uploadComplete(idx){
     console.log(this.state.files[idx])
   }
-  checkErrors () {
+  checkErrors(){
     return true
   }
   render () {
@@ -80,8 +80,8 @@ class FileUpload extends React.Component {
               ? <React.Fragment>
                 {files.map((file, i) => {
                   return (
-                    <FilePreview
-                      uploadComplete={() => { this.uploadComplete(i) }}
+                    <File
+                      uploadComplete={() => {this.uploadComplete(i)}}
                       file={file.file}
                       colour={file.colour}
                       key={i}

@@ -4,7 +4,7 @@ import PropTypes from 'prop-types'
 
 import './form.sass'
 
-export default class FilePreview extends React.Component {
+export default class File extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
@@ -86,7 +86,7 @@ export default class FilePreview extends React.Component {
   }
 }
 
-FilePreview.propTypes = {
+File.propTypes = {
   file: PropTypes.object,
   colour: PropTypes.string,
   uploadComplete: PropTypes.func
