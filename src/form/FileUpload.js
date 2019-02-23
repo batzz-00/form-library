@@ -13,7 +13,6 @@ class FileUpload extends React.Component {
   constructor (props) {
     super(props)
     this.state = { errors: null, value: '', files: null, uploaded: [] }
-    
 
     this.fileInput = React.createRef()
 
@@ -23,22 +22,22 @@ class FileUpload extends React.Component {
     this.fileUploadBox = React.createRef()
   }
   browseFiles (e) {
-    if(!e.target.classList.contains('select-file')){
+    if (!e.target.classList.contains('select-file')) {
       return false
     }
     this.fileInput.current.click()
   }
   handleChange () {
-    let colours = ["#2980b9", "#27ae60", "#16a085", "#d35400", "#c0392b"]
+    let colours = ['#2980b9', '#27ae60', '#16a085', '#d35400', '#c0392b']
     let actualFiles = []
     let formatColours = {}
-    for(let i in Object.keys(this.fileInput.current.files)){
-      if(formatColours[this.fileInput.current.files.item(i).type]){
-        actualFiles.push({colour: formatColours[this.fileInput.current.files.item(i).type], file: this.fileInput.current.files.item(i)})
+    for (let i in Object.keys(this.fileInput.current.files)) {
+      if (formatColours[this.fileInput.current.files.item(i).type]) {
+        actualFiles.push({ colour: formatColours[this.fileInput.current.files.item(i).type], file: this.fileInput.current.files.item(i) })
       } else {
         let colour = colours.splice(0, 1)[0]
         formatColours[this.fileInput.current.files.item(i).type] = colour
-        actualFiles.push({colour, file: this.fileInput.current.files.item(i)})
+        actualFiles.push({ colour, file: this.fileInput.current.files.item(i) })
       }
     }
 
@@ -46,15 +45,15 @@ class FileUpload extends React.Component {
     // interesting behaviour on file, new file objects dont seem to generated, rather the data is switched so react doesnt know to render a new object as its getting the
     // same ref? fixed by using componentdidupdate, somehow got some additional efficiency lol
   }
-  uploadComplete(idx){
+  uploadComplete (idx) {
     let newUploads = this.state.uploaded.slice()
     newUploads.push(this.state.files[idx])
     this.setState({ uploaded: newUploads })
-    if(this.state.uploaded.length === this.state.files.length){
+    if (this.state.uploaded.length === this.state.files.length) {
       console.log('all uploadsdone')
     }
   }
-  checkErrors(){
+  checkErrors () {
     return true
   }
   render () {
@@ -78,7 +77,7 @@ class FileUpload extends React.Component {
                 {files.map((file, i) => {
                   return (
                     <File
-                      uploadComplete={() => {this.uploadComplete(i)}}
+                      uploadComplete={() => { this.uploadComplete(i) }}
                       file={file.file}
                       colour={file.colour}
                       key={i}

@@ -32,7 +32,7 @@ export default class File extends React.Component {
     const fr = new FileReader()
     let fileReader = new Promise((resolve, reject) => {
       fr.onprogress = (e) => { this.setState({ loading: ((e.loaded / e.total) * 100) }) }
-      fr.onloadend = (e) => { resolve(e.target.result); this.props.uploadComplete(); this.setState({loading: false}) }
+      fr.onloadend = (e) => { resolve(e.target.result); this.props.uploadComplete(); this.setState({ loading: false }) }
     })
     fr.readAsDataURL(file)
 
