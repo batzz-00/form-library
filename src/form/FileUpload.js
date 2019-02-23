@@ -18,19 +18,51 @@ class FileUpload extends React.Component {
 
     this.handleChange = this.handleChange.bind(this)
     this.browseFiles = this.browseFiles.bind(this)
+    this.uploadComplete = this.uploadComplete.bind(this)
+    this.fileUploadBox = React.createRef()
   }
-  browseFiles () {
+  browseFiles (e) {
+    if (!e.target.classList.contains('select-file')) {
+      return false
+    }
     this.fileInput.current.click()
   }
   handleChange () {
-    let actualFiles = Object.keys(this.fileInput.current.files).map(file => { if (file !== 'length') { return this.fileInput.current.files[file] } })
-    console.log(actualFiles)
+    let colours = ['#2980b9', '#27ae60', '#16a085', '#d35400', '#c0392b']
+    let actualFiles = []
+    let formatColours = {}
+    for (let i in Object.keys(this.fileInput.current.files)) {
+      if (formatColours[this.fileInput.current.files.item(i).type]) {
+        actualFiles.push({ colour: formatColours[this.fileInput.current.files.item(i).type], file: this.fileInput.current.files.item(i) })
+      } else {
+        let colour = colours.splice(0, 1)[0]
+        formatColours[this.fileInput.current.files.item(i).type] = colour
+        actualFiles.push({ colour, file: this.fileInput.current.files.item(i) })
+      }
+    }
+    // let files = Object.keys(this.fileInput.current.files).map((file, i) =>
+    //   {
+    //     // if(file === "length")
+    //     console.log(file)
+    //     file.colour = "red"
+    //     return this.fileInput.current.files[file]
+    //   })
     this.setState({ files: actualFiles })
+    // interesting behaviour on file, new file objects dont seem to generated, rather the data is switched so react doesnt know to render a new object as its getting the
+    // same ref? fixed by using componentdidupdate, somehow got some additional efficiency lol
+
+    // note
+    // upload logic is in filepreview
+  }
+  uploadComplete (idx) {
+    console.log(this.state.files[idx])
+  }
+  checkErrors () {
+    return true
   }
   render () {
     const { title, name, value, errors, multiple } = this.props
     const { files } = this.state
-    console.log(files)
     return (
       <div className='input-wrapper'>
         <div className={'input' + (errors ? ' error' : '')}>
@@ -43,13 +75,15 @@ class FileUpload extends React.Component {
             onChange={this.handleChange}
             multiple
             onBlur={this.props.checkErrors} />
-          <div className={'select-file' + (multiple ? ' multiple' : '')} onClick={this.browseFiles} >
+          <div className={'select-file' + (multiple ? ' multiple' : '')} ref={this.fileUploadBox} onClick={this.browseFiles} >
             {files
               ? <React.Fragment>
                 {files.map((file, i) => {
                   return (
                     <FilePreview
-                      file={file}
+                      uploadComplete={() => { this.uploadComplete(i) }}
+                      file={file.file}
+                      colour={file.colour}
                       key={i}
                     />)
                 })}

@@ -21,7 +21,10 @@ export default class FilePreview extends React.Component {
   componentDidMount () {
     this.loadFile(this.props.file)
   }
-  componentWillUnmount () {
+  componentDidUpdate (prevProps) {
+    if (this.props.file.name !== prevProps.file.name) {
+      this.loadFile(this.props.file)
+    }
   }
   loadFile (file) {
     let isImage = file.type.split('/')[0] === 'image'
@@ -35,7 +38,7 @@ export default class FilePreview extends React.Component {
           this.setState({ loading: ((e.loaded / e.total) * 100) })
         }
       }
-      fr.onload = (e) => { resolve(e.target.result); console.log(e) }
+      fr.onload = (e) => { resolve(e.target.result); this.props.uploadComplete() }
     })
     fr.readAsDataURL(file)
     if (isImage) {
@@ -50,11 +53,12 @@ export default class FilePreview extends React.Component {
           image.src = result
         })
       }).then(image => {
-        console.log(image)
         this.setState({ image: image.img })
       }).catch(err => {
         console.log('file loading failed: ' + err.message)
       })
+    } else {
+      this.setState({ image: null })
     }
     f.name = file.name
     f.type = file.type
@@ -65,14 +69,17 @@ export default class FilePreview extends React.Component {
   }
   render () {
     const { imageSize, loading, file, image } = this.state
+    const { colour } = this.props
+    console.log('render')
     return (
-      <div className='file-wrapper'>
-        { loading === false
-          ? <div className='file-details' ref={this.fileDetails}>
+      <div className={'file-wrapper' + (loading === false ? ' finished' : '')}>
+        { loading !== true
+          ? <div className={'file-details' + (loading ? ' loading' : '')} ref={this.fileDetails}>
             <h1>{file.name}</h1>
             <h2>{`${file.size} ${file.sizeFormat}`}</h2>
           </div> : null }
-        {image ? <div className='image-wrapper' ref={this.imageWrapper}><div className='image' style={{ backgroundImage: `url('${image.src}')`, ...imageSize }} /></div> : null}
+        {image ? <div className='image-wrapper' ref={this.imageWrapper}><div className='image' style={{ backgroundImage: `url('${image.src}')`, ...imageSize }} /></div>
+          : <div className='file-filler' style={{ backgroundColor: colour }}><i /></div>}
         {loading ? <div className='progress-bar'><div className='bar' style={{ width: this.state.loading + '%' }} /></div> : null }
       </div>
     )
@@ -80,5 +87,7 @@ export default class FilePreview extends React.Component {
 }
 
 FilePreview.propTypes = {
-  file: PropTypes.object
+  file: PropTypes.object,
+  colour: PropTypes.string,
+  uploadComplete: PropTypes.func
 }

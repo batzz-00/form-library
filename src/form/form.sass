@@ -2,6 +2,12 @@ $font:  'Open Sans', sans-serif
 $border-colour: rgb(216, 216, 216)
 $border-hover-colour: rgb(155, 200, 230)  
 
+@mixin animate($animation, $time)
+    -webkit-animation: $animation $time forwards
+    -moz-animation:    $animation $time forwards
+    -o-animation:      $animation $time forwards
+    animation:         $animation $time forwards
+
 form
     display: flex
     font-family: $font
@@ -38,37 +44,50 @@ form
                 text-transform: uppercase
             >.select-file
                 width: 100%
-                height: 140px
                 padding: 14px
                 background-color: #fff
                 display: flex
                 border-radius: 8px
+                flex-wrap: wrap
                 >.file-wrapper
-                    box-sizing: border-box
-                    border-radius: 8px
-                    box-sizing: border-box
-                    overflow: hidden
+                    flex-shrink: 0
                     position: relative
-                    margin: 0 10px 
-                    width: calc( (100% / 6 ) - 20px)
-                    >.file-details
-                        display: flex
-                        flex-direction: column
-                        position: absolute
-                        bottom: 0
-                        height: auto
-                        padding: 10px
-                        box-sizing: border-box
-                        width: 100%
-                        >.progress-bar
+                    height: 120px
+                    position: relative
+                    margin: 5px
+                    border-radius: 8px
+                    overflow: hidden
+                    width: calc( (100% / 6 ) - 10px)
+                    &.finished
+                        @include animate(bounce, 1s)
+                    >.progress-bar
                             width: 100%
                             position: absolute
                             bottom: 0
-                            height: 15px
+                            height: 8px
                             background-color: #2c3e50
                             >.bar
-                                height: 15px
+                                height: 100%
                                 background-color: #2ecc71
+                    >.file-details
+                        display: flex
+                        flex-wrap: wrap
+                        align-content: flex-end
+                        position: absolute
+                        overflow: hidden
+                        height: 100%
+                        bottom: 0    
+                        background: linear-gradient(rgba(255, 255, 255, 0) 0%, rgba(0, 0, 0, 0) 50%, rgba(0, 0, 0, 0.5) 85%, rgba(0, 0, 0, 0.6) 100%)
+                        padding: 10px
+                        box-sizing: border-box
+                        width: 100%              
+                        .type
+                            top: 10px
+                            right: 10px
+                            position: absolute
+                            background-color: #000000
+                            color: #ffffff
+                            font-size: 11px
                         h1, h2
                             overflow: hidden
                             text-overflow: ellipsis
@@ -84,6 +103,12 @@ form
                         h2
                             color: rgb(214, 214, 214)
                             font-size: 10px
+                    >.file-details.loading
+                        bottom: 8px
+                    >.file-filler
+                        border-radius: 8px
+                        background-color: rgb(37, 37, 37)
+                        height: 100%
                     >.image-wrapper
                         height: 100%
                         >.image
@@ -93,7 +118,8 @@ form
                             background-repeat: no-repeat
                             background-position: center
                 &.multiple
-                    height: 120px
+                    max-height: 280px
+                    overflow-y: scroll
             >input[type='text'], >input[type='password'], select
                 font-family: $font
                 background: #FFFFFF
@@ -148,3 +174,11 @@ form
                 width: auto
                 margin: 0 3px 0 0
                 font-size: 11px 
+
+@keyframes bounce
+    0%  
+        transform: scale(1.0)
+    50%  
+        transform: scale(1.02)
+    100%  
+        transform: scale(1.0)
