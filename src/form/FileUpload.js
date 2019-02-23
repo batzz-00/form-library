@@ -12,7 +12,8 @@ import File from './File'
 class FileUpload extends React.Component {
   constructor (props) {
     super(props)
-    this.state = { errors: null, value: '', files: null }
+    this.state = { errors: null, value: '', files: null, uploaded: [] }
+    
 
     this.fileInput = React.createRef()
 
@@ -40,22 +41,18 @@ class FileUpload extends React.Component {
         actualFiles.push({colour, file: this.fileInput.current.files.item(i)})
       }
     }
-    // let files = Object.keys(this.fileInput.current.files).map((file, i) => 
-    //   {
-    //     // if(file === "length")
-    //     console.log(file)
-    //     file.colour = "red"
-    //     return this.fileInput.current.files[file]
-    //   })
+
     this.setState({ files: actualFiles })
     // interesting behaviour on file, new file objects dont seem to generated, rather the data is switched so react doesnt know to render a new object as its getting the
     // same ref? fixed by using componentdidupdate, somehow got some additional efficiency lol
-
-    // note
-    //upload logic is in filepreview 
   }
   uploadComplete(idx){
-    console.log(this.state.files[idx])
+    let newUploads = this.state.uploaded.slice()
+    newUploads.push(this.state.files[idx])
+    this.setState({ uploaded: newUploads })
+    if(this.state.uploaded.length === this.state.files.length){
+      console.log('all uploadsdone')
+    }
   }
   checkErrors(){
     return true

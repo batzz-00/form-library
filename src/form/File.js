@@ -31,16 +31,11 @@ export default class File extends React.Component {
     let f = {}
     const fr = new FileReader()
     let fileReader = new Promise((resolve, reject) => {
-      fr.onprogress = (e) => {
-        if (e.loaded === e.total) {
-          this.setState({ loading: false })
-        } else {
-          this.setState({ loading: ((e.loaded / e.total) * 100) })
-        }
-      }
-      fr.onload = (e) => { resolve(e.target.result); this.props.uploadComplete() }
+      fr.onprogress = (e) => { this.setState({ loading: ((e.loaded / e.total) * 100) }) }
+      fr.onloadend = (e) => { resolve(e.target.result); this.props.uploadComplete(); this.setState({loading: false}) }
     })
     fr.readAsDataURL(file)
+
     if (isImage) {
       fileReader.then(result => {
         let image = new Image()
@@ -57,8 +52,6 @@ export default class File extends React.Component {
       }).catch(err => {
         console.log('file loading failed: ' + err.message)
       })
-    } else {
-      this.setState({ image: null })
     }
     f.name = file.name
     f.type = file.type
@@ -70,7 +63,6 @@ export default class File extends React.Component {
   render () {
     const { imageSize, loading, file, image } = this.state
     const { colour } = this.props
-    console.log('render')
     return (
       <div className={'file-wrapper' + (loading === false ? ' finished' : '')}>
         { loading !== true
