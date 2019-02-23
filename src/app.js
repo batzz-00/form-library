@@ -24,7 +24,7 @@ export default class App extends React.Component {
       <React.Fragment>
         <div className='container' style={{ width: '50%', margin: '50px auto' }}>
           <Form onSubmit={this.onSubmit}>
-            <Textbox title='Name' name='rat' after={1500} do={this.kek} required/>
+            <Textbox title='Name' name='rat' after={1500} do={this.kek} required />
             <FileUpload title='File Upload' name='files' multiple />
             <Submit value='Submit' />
           </Form>

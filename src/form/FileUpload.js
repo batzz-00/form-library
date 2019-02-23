@@ -55,11 +55,11 @@ class FileUpload extends React.Component {
     }
   }
   checkErrors () {
-    if(this.complete){
+    if (this.complete) {
       return true
     } else {
       let existingErrors = this.state.errors ? this.state.errors : []
-      this.setState({errors: [{rule: "completeUpload", text: "Wait till all your files are uploaded", passed: false}].concat(existingErrors)})
+      this.setState({ errors: [{ rule: 'completeUpload', text: 'Wait till all your files are uploaded', passed: false }].concat(existingErrors) })
       return false
     }
   }
@@ -109,7 +109,6 @@ FileUpload.propTypes = {
   title: PropTypes.string,
   name: PropTypes.string,
   value: PropTypes.string,
-  errors: PropTypes.array,
   checkErrors: PropTypes.func,
   multiple: PropTypes.bool
 }
