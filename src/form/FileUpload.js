@@ -15,6 +15,7 @@ class FileUpload extends React.Component {
     this.state = { errors: null, value: '', files: null, uploaded: [] }
 
     this.fileInput = React.createRef()
+    this.complete = false
 
     this.handleChange = this.handleChange.bind(this)
     this.browseFiles = this.browseFiles.bind(this)
@@ -50,15 +51,22 @@ class FileUpload extends React.Component {
     newUploads.push(this.state.files[idx])
     this.setState({ uploaded: newUploads })
     if (this.state.uploaded.length === this.state.files.length) {
-      console.log('all uploadsdone')
+      this.complete = true
     }
   }
   checkErrors () {
-    return true
+    if(this.complete){
+      return true
+    } else {
+      let existingErrors = this.state.errors ? this.state.errors : []
+      this.setState({errors: [{rule: "completeUpload", text: "Wait till all your files are uploaded", passed: false}].concat(existingErrors)})
+      return false
+    }
   }
   render () {
-    const { title, name, value, errors, multiple } = this.props
-    const { files } = this.state
+    const { title, name, value, multiple } = this.props
+    const { files, errors } = this.state
+    console.log(errors)
     return (
       <div className='input-wrapper'>
         <div className={'input' + (errors ? ' error' : '')}>

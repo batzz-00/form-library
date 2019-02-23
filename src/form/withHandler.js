@@ -66,6 +66,7 @@ export const withHandler = (WrappedComponent) => {
       const { customErrors } = this.props
       return new Promise((resolve, reject) => {
         this.validator.validateInput(this.state.value).then(errors => {
+          console.log(errors)
           let errorCollection = customErrors ? errors.concat(customErrors) : errors
           let problems = errorCollection.filter(error => !error.passed)
           this.props.setErrors(this.props.name, problems)
