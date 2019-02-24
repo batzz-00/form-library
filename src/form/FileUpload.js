@@ -89,7 +89,7 @@ class FileUpload extends React.Component {
   }
 }
 
-export default withHandler(FileUpload, ['required'])
+export default withHandler(FileUpload, ['required'], [])
 
 FileUpload.propTypes = {
   title: PropTypes.string,

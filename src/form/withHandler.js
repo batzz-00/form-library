@@ -27,8 +27,7 @@ export const withHandler = (WrappedComponent, allowedRules = null, defaultValue)
       if (!this.props.after && this.props.do) {
         console.log('You have a do prop but no after prop, the do prop is redundant')
       }
-
-      this.props.updateInput(props.name, props.default || props.defaultValue || defaultValue | '')
+      this.props.updateInput(props.name, props.default || props.defaultValue || defaultValue || '')
 
       this.validator = allowedRules ? new Validator(Component, props, allowedRules) : new Validator(Component, props)
     }
