@@ -14,9 +14,6 @@ export default class File extends React.Component {
     }
     this.fileDetails = React.createRef()
     this.imageWrapper = React.createRef()
-    window.addEventListener('resize', (e) => {
-      this.render()
-    })
   }
   componentDidMount () {
     this.loadFile(this.props.file)
@@ -35,7 +32,6 @@ export default class File extends React.Component {
       fr.onloadend = (e) => { resolve(e.target.result); this.props.uploadComplete(); this.setState({ loading: false }) }
     })
     fr.readAsDataURL(file)
-
     if (isImage) {
       fileReader.then(result => {
         let image = new Image()
@@ -58,7 +54,11 @@ export default class File extends React.Component {
     f.format = file.type.split('/')[file.type.split('/').length - 1]
     f.size = (file.size / 1000000 < 1 ? file.size / 1000 : file.size / 1000000).toFixed(2)
     f.sizeFormat = file.size / 1000000 < 1 ? 'KB' : 'MB'
-    this.setState({ file: f })
+    if (isImage && this.state.image) {
+      this.setState({ file: f })
+    } else {
+      this.setState({ file: f, image: null })
+    }
   }
   render () {
     const { imageSize, loading, file, image } = this.state

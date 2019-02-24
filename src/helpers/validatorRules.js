@@ -9,9 +9,12 @@ export const supportedRules = [
   'required', // The field cannot be empty
   'lessThan', // Less than given number
   'between', // Between given two numbers (maybe have an and prop or send an object hmm)
-  'before', // DATE - maybe merge with greaterthan for ease of use if possibel
-  'after', // DATE
-  'on' // DATE
+  'beforeDate', // DATE - maybe merge with greaterthan for ease of use if possibel
+  'afterDate', // DATE
+  'on', // DATE
+  // File upload rules
+  'FileUpload.maxSize',
+  'FileUpload.maxFiles'
 ]
 
 export const checkRules = (props) => {

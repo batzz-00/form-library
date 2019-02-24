@@ -2,12 +2,15 @@ import { supportedRules } from './validatorRules.js'
 import * as validatorFunctions from './validatorFunctions.js'
 
 export default class Validator {
-  constructor (props) {
+  constructor (component, props, allowedRules = Object.keys(validatorFunctions)) {
     let rules = []
+    let componentSpecificRules = supportedRules.filter(rule => rule.split('.')[0] === component.displayName.split('.')[1]).map(rule => rule.split('.')[1])
     Object.keys(props).forEach(prop => {
-      if (supportedRules.includes(prop)) {
+      if (supportedRules.includes(prop) || componentSpecificRules.includes(prop)) {
         if (rules.includes(prop)) {
-          console.warn(`Trying to add duplicate rule ${prop}, please remove this, will be ignored.`)
+          console.warn(`Trying to add duplicate rule ${prop}, please remove this, will be ignored.`) // redundant react doesnt seem to pass props twice anyway
+        } else if (supportedRules.includes(prop) && !allowedRules.includes(prop)) {
+          console.warn(`You can not add the rule: ${prop} to ${component.displayName.split('.')[1]}, this will be ignored (allowed rules: ${allowedRules.join(',')})`)
         } else {
           rules.push({ rule: prop, value: props[prop] })
         }
@@ -30,6 +33,9 @@ export default class Validator {
             break
           case 'max':
             rules.push({ rule: rule.rule, text: `Maximum ${rule.value} characters`, passed: validatorFunctions.max(input, rule.value) })
+            break
+          case 'maxFiles':
+            rules.push({ rule: rule.rule, text: `You can only upload ${rule.value} files`, passed: validatorFunctions.maxFiles(input, rule.value) })
             break
         }
       }

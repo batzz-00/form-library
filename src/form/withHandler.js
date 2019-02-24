@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 
 import Validator from '../helpers/validator'
 
-export const withHandler = (WrappedComponent) => {
+export const withHandler = (WrappedComponent, allowedRules = null) => {
   class Component extends React.Component {
     constructor (props) {
       super(props)
@@ -30,7 +30,7 @@ export const withHandler = (WrappedComponent) => {
 
       this.props.updateInput(props.name, props.default || props.defaultValue || '')
 
-      this.validator = new Validator(props)
+      this.validator = allowedRules ? new Validator(Component, props, allowedRules) : new Validator(Component, props)
       this.validator.validateInput(this.state.value).then(errors => {
         let problems = props.customErrors ? errors.concat(props.customErrors) : errors
         props.setErrors(props.name, problems)
@@ -64,9 +64,9 @@ export const withHandler = (WrappedComponent) => {
     // move to withErrors?
     checkErrors () {
       const { customErrors } = this.props
+      console.log('checking errors')
       return new Promise((resolve, reject) => {
         this.validator.validateInput(this.state.value).then(errors => {
-          console.log(errors)
           let errorCollection = customErrors ? errors.concat(customErrors) : errors
           let problems = errorCollection.filter(error => !error.passed)
           this.props.setErrors(this.props.name, problems)
@@ -82,6 +82,7 @@ export const withHandler = (WrappedComponent) => {
       return (<WrappedComponent handleChange={this.handleChange} value={this.state.value} checkErrors={this.checkErrors} errors={this.state.errors} {...this.props} />)
     }
   }
+  Component.displayName = `withHandler.${getDisplayName(WrappedComponent)}`
   Component.propTypes = {
     changeDelay: PropTypes.number,
     updateInput: PropTypes.func,
@@ -96,6 +97,10 @@ export const withHandler = (WrappedComponent) => {
 
   }
   return Component
+}
+
+function getDisplayName (Component) {
+  return Component.displayName || Component.name || 'Component'
 }
 
 // FORWARD REFS ? maybe not even necessary

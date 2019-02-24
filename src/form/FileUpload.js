@@ -9,10 +9,14 @@ import './form.sass'
 import Errors from './Errors'
 import File from './File'
 
+import { withHandler } from './withHandler'
+
+// value == files
+
 class FileUpload extends React.Component {
   constructor (props) {
     super(props)
-    this.state = { errors: null, value: '', files: null, uploaded: [] }
+    this.state = { errors: null, files: [], uploaded: [] }
 
     this.fileInput = React.createRef()
     this.complete = false
@@ -30,7 +34,7 @@ class FileUpload extends React.Component {
   }
   handleChange () {
     let colours = ['#2980b9', '#27ae60', '#16a085', '#d35400', '#c0392b']
-    let actualFiles = []
+    let actualFiles = this.props.append ? this.state.files : []
     let formatColours = {}
     for (let i in Object.keys(this.fileInput.current.files)) {
       if (formatColours[this.fileInput.current.files.item(i).type]) {
@@ -42,17 +46,20 @@ class FileUpload extends React.Component {
       }
     }
 
-    this.setState({ files: actualFiles })
+    this.props.handleChange(this.props.name, actualFiles)
+    this.setState({ files: actualFiles, uploaded: [] })
     // interesting behaviour on file, new file objects dont seem to generated, rather the data is switched so react doesnt know to render a new object as its getting the
     // same ref? fixed by using componentdidupdate, somehow got some additional efficiency lol
   }
   uploadComplete (idx) {
-    let newUploads = this.state.uploaded.slice()
-    newUploads.push(this.state.files[idx])
-    this.setState({ uploaded: newUploads })
-    if (this.state.uploaded.length === this.state.files.length) {
-      this.complete = true
-    }
+    let complete = this.state.uploaded.slice()
+    complete.push(this.state.files[idx])
+    this.setState({ uploaded: complete }, () => {
+      if (this.state.uploaded.length === this.state.files.length) {
+        this.complete = true
+        this.props.handleChange(this.props.name, this.state.files)
+      }
+    })
   }
   checkErrors () {
     if (this.complete) {
@@ -64,9 +71,8 @@ class FileUpload extends React.Component {
     }
   }
   render () {
-    const { title, name, value, multiple } = this.props
-    const { files, errors } = this.state
-    console.log(errors)
+    const { title, name, multiple, errors } = this.props
+    const { files } = this.state
     return (
       <div className='input-wrapper'>
         <div className={'input' + (errors ? ' error' : '')}>
@@ -75,7 +81,6 @@ class FileUpload extends React.Component {
             ref={this.fileInput}
             name={name || null}
             type='file'
-            defaultValue={value || null}
             onChange={this.handleChange}
             multiple
             onBlur={this.props.checkErrors} />
@@ -103,12 +108,15 @@ class FileUpload extends React.Component {
   }
 }
 
-export default FileUpload
+console.log(FileUpload)
+export default withHandler(FileUpload, ['required'])
 
 FileUpload.propTypes = {
   title: PropTypes.string,
   name: PropTypes.string,
-  value: PropTypes.string,
   checkErrors: PropTypes.func,
-  multiple: PropTypes.bool
+  multiple: PropTypes.bool,
+  append: PropTypes.bool,
+  handleChange: PropTypes.func,
+  errors: PropTypes.array
 }

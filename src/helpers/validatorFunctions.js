@@ -23,7 +23,16 @@ export const max = (value, max) => {
 }
 
 export const required = (value) => {
-  if (value === '' || value === undefined) {
+  if (value === '' || value === undefined || value === null) {
+    return false
+  } else {
+    return true
+  }
+}
+
+export const maxFiles = (value, maxFileCount) => {
+  console.log(value)
+  if (value.length > maxFileCount) {
     return false
   } else {
     return true
