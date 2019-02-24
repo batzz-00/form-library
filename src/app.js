@@ -13,9 +13,6 @@ export default class App extends React.Component {
     super(props)
     this.onSubmit = this.onSubmit.bind(this)
   }
-  kek () {
-    console.log('kek')
-  }
   onSubmit (data) {
     console.log(data)
   }
@@ -24,7 +21,7 @@ export default class App extends React.Component {
       <React.Fragment>
         <div className='container' style={{ width: '50%', margin: '50px auto' }}>
           <Form onSubmit={this.onSubmit}>
-            <Textbox title='Name' name='rat' after={1500} do={this.kek} required />
+            <Textbox title='Name' name='rat' required />
             <FileUpload title='File Upload' name='files' multiple required maxFiles={10} maxSize={1024} />
             <Submit value='Submit' />
           </Form>

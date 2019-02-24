@@ -64,7 +64,6 @@ export const withHandler = (WrappedComponent, allowedRules = null) => {
     // move to withErrors?
     checkErrors () {
       const { customErrors } = this.props
-      console.log('checking errors')
       return new Promise((resolve, reject) => {
         this.validator.validateInput(this.state.value).then(errors => {
           let errorCollection = customErrors ? errors.concat(customErrors) : errors

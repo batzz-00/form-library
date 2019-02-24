@@ -23,7 +23,7 @@ export const max = (value, max) => {
 }
 
 export const required = (value) => {
-  if (value === '' || value === undefined || value === null) {
+  if (value === '' || value === undefined || value === null || value.length === 0) {
     return false
   } else {
     return true
@@ -31,7 +31,6 @@ export const required = (value) => {
 }
 
 export const maxFiles = (value, maxFileCount) => {
-  console.log(value)
   if (value.length > maxFileCount) {
     return false
   } else {

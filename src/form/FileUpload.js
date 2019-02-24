@@ -23,7 +23,6 @@ class FileUpload extends React.Component {
 
     this.handleChange = this.handleChange.bind(this)
     this.browseFiles = this.browseFiles.bind(this)
-    this.uploadComplete = this.uploadComplete.bind(this)
     this.fileUploadBox = React.createRef()
   }
   browseFiles (e) {
@@ -45,31 +44,15 @@ class FileUpload extends React.Component {
         actualFiles.push({ colour, file: this.fileInput.current.files.item(i) })
       }
     }
-
-    this.props.handleChange(this.props.name, actualFiles)
+    let rawFiles = actualFiles.map(obj => obj.file)
+    console.log(rawFiles)
+    this.props.handleChange(this.props.name, rawFiles)
     this.setState({ files: actualFiles, uploaded: [] })
     // interesting behaviour on file, new file objects dont seem to generated, rather the data is switched so react doesnt know to render a new object as its getting the
     // same ref? fixed by using componentdidupdate, somehow got some additional efficiency lol
+    // must be something in the diffing algorithm
   }
-  uploadComplete (idx) {
-    let complete = this.state.uploaded.slice()
-    complete.push(this.state.files[idx])
-    this.setState({ uploaded: complete }, () => {
-      if (this.state.uploaded.length === this.state.files.length) {
-        this.complete = true
-        this.props.handleChange(this.props.name, this.state.files)
-      }
-    })
-  }
-  checkErrors () {
-    if (this.complete) {
-      return true
-    } else {
-      let existingErrors = this.state.errors ? this.state.errors : []
-      this.setState({ errors: [{ rule: 'completeUpload', text: 'Wait till all your files are uploaded', passed: false }].concat(existingErrors) })
-      return false
-    }
-  }
+
   render () {
     const { title, name, multiple, errors } = this.props
     const { files } = this.state
@@ -90,7 +73,6 @@ class FileUpload extends React.Component {
                 {files.map((file, i) => {
                   return (
                     <File
-                      uploadComplete={() => { this.uploadComplete(i) }}
                       file={file.file}
                       colour={file.colour}
                       key={i}
@@ -108,7 +90,6 @@ class FileUpload extends React.Component {
   }
 }
 
-console.log(FileUpload)
 export default withHandler(FileUpload, ['required'])
 
 FileUpload.propTypes = {
