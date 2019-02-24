@@ -30,10 +30,19 @@ export const required = (value) => {
   }
 }
 
-export const maxFiles = (value, maxFileCount) => {
-  if (value.length > maxFileCount) {
+export const maxFiles = (files, maxFileCount) => {
+  if (files.length > maxFileCount) {
     return false
   } else {
     return true
   }
+}
+
+export const maxSize = (files, maxFileSize) => {
+  // console.log('run')
+  // if(Object.keys(files).map(file => file.size).reduce((p, n) => p+n) > maxFileSize * 1000){
+  //   return false
+  // } else {
+  //   return true
+  // }
 }

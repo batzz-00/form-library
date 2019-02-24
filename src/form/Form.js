@@ -43,19 +43,22 @@ export default class Form extends React.Component {
     }
   }
   error () {
-    let valid = true
     let promises = []
     Object.keys(this.inputs).forEach(input => {
       promises.push(this.inputs[input].ref.current.checkErrors())
     })
-    return Promise.all(promises).then(() => {
-      Object.keys(this.errors).forEach(input => {
-        if (this.errors[input].length !== 0) {
-          valid = false
-        }
-      })
-      return valid
+
+    return Promise.all(promises).then((result) => {
+      if (result.map(error => !error).length > 0) {
+        return false
+      } else {
+        return true
+      }
     })
+    // good practice to resolve with the errors that didnt pass or reject if a single error failed? - this way a single error will reject the whole process
+    // due to promise.all dying if a single promise fails
+    // usign the resolve approach here as I don't want to handle the error, as its already shown on the client side and a validation error isnt a program breaking
+    // error, also allows me to have optional errors.
   }
   updateInput (key, value) {
     let data = this.inputs

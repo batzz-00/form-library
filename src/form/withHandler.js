@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 
 import Validator from '../helpers/validator'
 
-export const withHandler = (WrappedComponent, allowedRules = null) => {
+export const withHandler = (WrappedComponent, allowedRules = null, defaultValue) => {
   class Component extends React.Component {
     constructor (props) {
       super(props)
@@ -28,13 +28,9 @@ export const withHandler = (WrappedComponent, allowedRules = null) => {
         console.log('You have a do prop but no after prop, the do prop is redundant')
       }
 
-      this.props.updateInput(props.name, props.default || props.defaultValue || '')
+      this.props.updateInput(props.name, props.default || props.defaultValue || defaultValue | '')
 
       this.validator = allowedRules ? new Validator(Component, props, allowedRules) : new Validator(Component, props)
-      this.validator.validateInput(this.state.value).then(errors => {
-        let problems = props.customErrors ? errors.concat(props.customErrors) : errors
-        props.setErrors(props.name, problems)
-      })
     }
     handleChange (key, input) {
       if (!key) {
@@ -70,9 +66,9 @@ export const withHandler = (WrappedComponent, allowedRules = null) => {
           let problems = errorCollection.filter(error => !error.passed)
           this.props.setErrors(this.props.name, problems)
           if (problems.length === 0) {
-            this.setState({ errors: null }, resolve)
+            this.setState({ errors: null }, () => resolve(true))
           } else {
-            this.setState({ errors: problems }, resolve)
+            this.setState({ errors: problems }, () => resolve(false))
           }
         })
       })

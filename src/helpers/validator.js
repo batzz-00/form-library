@@ -19,6 +19,9 @@ export default class Validator {
     this.rules = rules
     this.validateInput = this.validateInput.bind(this)
   }
+  getRules () {
+    return this.rules
+  }
   validateInput (input) {
     return new Promise((resolve, reject) => {
       let rules = []
@@ -36,6 +39,9 @@ export default class Validator {
             break
           case 'maxFiles':
             rules.push({ rule: rule.rule, text: `You can only upload ${rule.value} files`, passed: validatorFunctions.maxFiles(input, rule.value) })
+            break
+          case 'maxSize':
+            rules.push({ rule: rule.rule, text: `Maximum file size of ${rule.value} passed`, passed: validatorFunctions.maxSize(input, rule.value) })
             break
         }
       }

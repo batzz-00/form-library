@@ -45,7 +45,6 @@ class FileUpload extends React.Component {
       }
     }
     let rawFiles = actualFiles.map(obj => obj.file)
-    console.log(rawFiles)
     this.props.handleChange(this.props.name, rawFiles)
     this.setState({ files: actualFiles, uploaded: [] })
     // interesting behaviour on file, new file objects dont seem to generated, rather the data is switched so react doesnt know to render a new object as its getting the
