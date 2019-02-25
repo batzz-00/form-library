@@ -45,8 +45,8 @@ class TimeInput extends React.Component {
     let blockedOutput = []
     let split = val.split('')
     let count = 0
-    for (let i in val.split('')) {
-      if (val.split('').length % 2 === 0 && parseInt(i) === val.split('').length - 1) {
+    for (let i in split) {
+      if (split.length % 2 === 0 && parseInt(i) === split.length - 1) {
         break
       }
       if (it % blocks === 1) {
