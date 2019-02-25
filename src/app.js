@@ -7,6 +7,8 @@ import Textbox from './form/TextBox'
 // import Textarea from './form/TextArea'
 import FileUpload from './form/FileUpload'
 import Submit from './form/Submit'
+import TextArea from './form/TextArea'
+import TimeInput from './form/TimeInput'
 
 export default class App extends React.Component {
   constructor (props) {
@@ -22,6 +24,8 @@ export default class App extends React.Component {
         <div className='container' style={{ width: '50%', margin: '50px auto' }}>
           <Form onSubmit={this.onSubmit}>
             <Textbox title='Name' name='rat' required />
+            <TextArea title='rara' name='rata' required />
+            <TimeInput />
             <FileUpload title='File Upload' name='files' multiple required maxFiles={10} maxSize={1024} />
             <Submit value='Submit' />
           </Form>

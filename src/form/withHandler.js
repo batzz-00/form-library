@@ -73,7 +73,7 @@ export const withHandler = (WrappedComponent, allowedRules = null, defaultValue)
       })
     }
     render () {
-      return (<WrappedComponent handleChange={this.handleChange} value={this.state.value} checkErrors={this.checkErrors} errors={this.state.errors} {...this.props} />)
+      return (<WrappedComponent handleChange={this.handleChange} defaultValue={this.props.defaultValue} checkErrors={this.checkErrors} errors={this.state.errors} {...this.props} />)
     }
   }
   Component.displayName = `withHandler.${getDisplayName(WrappedComponent)}`

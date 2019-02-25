@@ -6,12 +6,11 @@ try do this in a HOC if possible
 
 more validators
 
-onload (with errors from past attempt- ajax should hnadle this tbh)
-
 add custom h1s and props that requite a prop like ignore so the form children loop ignores it
 
+limit filetypes
+show file format 
 
-fileupload separate by files
-show uploading status
-show file format and preview if possible
-have max size validator or individual size validator
+if two children have same name either somehow duplicate or send warning 
+
+make it so validator errors can have parameters ? 
