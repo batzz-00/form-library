@@ -20,7 +20,7 @@ class TimeInput extends React.Component {
     this.onKeyDown = this.onKeyDown.bind(this)
   }
   handleChange (e) {
-    let blockDelimiter = ' '
+    let blockDelimiter = "\|"
 
     if (blockDelimiter.charCodeAt(0) === this.lastKey.charCodeAt(0)) {
       return false
@@ -32,10 +32,12 @@ class TimeInput extends React.Component {
 
     let it = 0
     let blocks = 2
-    let delimiterSize = 1
+    let delimiterSize = 5
     let maxLength = 11
 
-    let reg = new RegExp(blockDelimiter, 'g')
+    let reg = new RegExp(blockDelimiter.replace(blockDelimiter, '\\$&'), 'g')
+    console.log(e.target.value.replace(reg, ''))
+    console.log(reg)
     let val = e.target.value.replace(reg, '').split('').slice(0, maxLength).join('')
 
     let diff = Math.abs(this.selectionStart - this.selectionEnd)
@@ -53,7 +55,7 @@ class TimeInput extends React.Component {
         break
       }
       if (it % blocks === 1) {
-        blockedOutput.push(new Array(delimiterSize).fill(blockDelimiter).map(e => e))
+        blockedOutput.push(new Array(delimiterSize).fill(blockDelimiter))
       } else {
         blockedOutput[it] = []
         for (let b = 0; b <= blocks - 1; b++) {
@@ -67,6 +69,7 @@ class TimeInput extends React.Component {
         count = 0
       }
     }
+    console.log(blockedOutput)
 
     val = blockedOutput.length === 0 ? '' : blockedOutput.reduce((p, n) => { return p.concat(n) }).join('')
     this.actualValue = val.replace(reg, '')
