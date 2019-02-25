@@ -29,15 +29,17 @@ class TimeInput extends React.Component {
     const { displayValue } = this.state
     const { actualValue } = this
     // options
-    let reg = new RegExp(blockDelimiter, 'g')
-    let val = e.target.value.replace(reg, '')
+
     let it = 0
     let blocks = 2
-    // let maxLength = 10 //implement // put all this in a helper
-    // let limit // set limit
+    let maxLength = 11
+
+    let reg = new RegExp(blockDelimiter, 'g')
+    let val = e.target.value.replace(reg, '').split('').slice(0, maxLength).join('')
+
+    let diff = Math.abs(this.selectionStart - this.selectionEnd)
 
     if (this.lastKey === 'Backspace') {
-      let diff = Math.abs(this.selectionStart - this.selectionEnd)
       val = diff !== 0 ? displayValue.split('').slice(0, displayValue.length - diff).join('').replace(reg, '')
         : actualValue.split('').splice(0, actualValue.length - 1).join('')
     }
@@ -45,8 +47,8 @@ class TimeInput extends React.Component {
     let blockedOutput = []
     let split = val.split('')
     let count = 0
-    for (let i in split) {
-      if (split.length % 2 === 0 && parseInt(i) === split.length - 1) {
+    for (let i in val.split('')) {
+      if (val.split('').length % 2 === 0 && parseInt(i) === val.split('').length - 1) {
         break
       }
       if (it % blocks === 1) {
@@ -66,9 +68,17 @@ class TimeInput extends React.Component {
     }
 
     val = blockedOutput.length === 0 ? '' : blockedOutput.reduce((p, n) => { return p.concat(n) }).join('')
-
     this.actualValue = val.replace(reg, '')
     this.setState({ displayValue: val })
+    // if(newActualValue.length >= maxLength){
+    //   if(this.lastKey === "Backspace") {
+    //     this.actualValue = newActualValue
+    //     this.setState({ displayValue: val})
+    //   }
+    // } else {
+    //   this.actualValue = newActualValue
+    //   this.setState({ displayValue: val})
+    // }
   }
   onKeyDown (e) {
     this.lastKey = e.key
