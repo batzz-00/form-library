@@ -32,6 +32,7 @@ class TimeInput extends React.Component {
 
     let it = 0
     let blocks = 2
+    let delimiterSize = 1
     let maxLength = 11
 
     let reg = new RegExp(blockDelimiter, 'g')
@@ -52,7 +53,7 @@ class TimeInput extends React.Component {
         break
       }
       if (it % blocks === 1) {
-        blockedOutput.push(new Array(blocks).fill(blockDelimiter).map(e => e))
+        blockedOutput.push(new Array(delimiterSize).fill(blockDelimiter).map(e => e))
       } else {
         blockedOutput[it] = []
         for (let b = 0; b <= blocks - 1; b++) {
