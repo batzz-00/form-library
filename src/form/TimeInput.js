@@ -26,6 +26,8 @@ class TimeInput extends React.Component {
       return false
     }
 
+    const { displayValue } = this.state
+    const { actualValue } = this
     // options
     let reg = new RegExp(blockDelimiter, 'g')
     let val = e.target.value.replace(reg, '')
@@ -35,13 +37,18 @@ class TimeInput extends React.Component {
     // let limit // set limit
 
     if (this.lastKey === 'Backspace') {
-      val = this.actualValue.split('').splice(0, this.actualValue.length - 1).join('')
+      let diff = Math.abs(this.selectionStart - this.selectionEnd)
+      val = diff !== 0 ? displayValue.split('').slice(0, displayValue.length - diff).join('').replace(reg, '')
+        : actualValue.split('').splice(0, actualValue.length - 1).join('')
     }
 
     let blockedOutput = []
     let split = val.split('')
     let count = 0
-    val.split('').forEach(() => {
+    for (let i in val.split('')) {
+      if (val.split('').length % 2 === 0 && parseInt(i) === val.split('').length - 1) {
+        break
+      }
       if (it % blocks === 1) {
         blockedOutput.push(new Array(blocks).fill(blockDelimiter).map(e => e))
       } else {
@@ -56,7 +63,7 @@ class TimeInput extends React.Component {
         it++
         count = 0
       }
-    })
+    }
 
     val = blockedOutput.length === 0 ? '' : blockedOutput.reduce((p, n) => { return p.concat(n) }).join('')
 
@@ -65,6 +72,9 @@ class TimeInput extends React.Component {
   }
   onKeyDown (e) {
     this.lastKey = e.key
+    this.selectionStart = e.target.selectionStart
+    this.selectionEnd = e.target.selectionEnd
+    this.selectionDirection = e.target.selectionDirection
   }
   render () {
     const { title, name, placeholder, type, errors } = this.props
