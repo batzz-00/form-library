@@ -28,17 +28,22 @@ export default class inputSpacer {
   blockFormatter (blockType, blockText, blockFullLength) {
     let format = dateFormats[blockType]
     let output = blockText.join('')
+    let formatBlock = String(format.max).split('')
     switch (blockType) {
-      case 'h':
+      case 'h' :
+      case 'm':
         let input = parseInt(output)
         if (isNaN(input)) { return '' }
         if (input < format.min) {
           output = format.min
         }
-        if (input > format.max) {
+        console.log(parseInt(formatBlock[1]))
+        if (input > formatBlock[1] && blockText.length === 1) {
+          output = `0${input}`
+        } else if (input > format.max && blockText.length === 2) {
           output = format.max
         }
-    }
+    } // think of best way to implemnt his
     return String(output).split('')
   }
   spaceInput (input) {
@@ -74,7 +79,6 @@ export default class inputSpacer {
         // last check makes sure that a number below the current iterable ( in the case of a block array of [3,1,5]), is not ticked by the modulo operator at the first text
         // has to wait for the total text length (i) to reach at least to the current total (iterableSize)
         blockedOutput.push(new Array(delimiterSize).fill(delimiter))
-        console.log(blockedOutput[it])
         count++
         it += 2
       }
