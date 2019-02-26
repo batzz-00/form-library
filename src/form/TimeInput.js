@@ -21,12 +21,12 @@ class TimeInput extends React.Component {
     this.actualValue = ''
     this.handleChange = this.handleChange.bind(this)
     this.onKeyDown = this.onKeyDown.bind(this)
-    this.inputSpacer = new InputSpacer(' ', 2, 2, 10)
+    this.inputSpacer = new InputSpacer(' ', 2, [3, 1, 3], 11)
   }
   handleChange (e) {
     this.inputSpacer.spaceInput(e.target.value)
     this.setState({ displayValue: this.inputSpacer.displayValue })
-  }
+  } 
   onKeyDown (e) {
     this.inputSpacer.setLastKey(e.key)
     this.inputSpacer.setSelectionStart(e.target.selectionStart)

@@ -1,9 +1,10 @@
 export default class inputSpacer {
-  constructor (delimiter, delimiterSize = 2, blockSize = 2, maxLength = 0) {
+  constructor (delimiter, delimiterSize = 1, blockSize = 2, maxLength) { 
     this.delimiter = delimiter
     this.delimiterSize = delimiterSize
     this.blockSize = blockSize
-    this.maxLength = maxLength
+    this.maxLength = blockSize.constructor === Array && !maxLength ? blockSize.reduce((p,n) => p+n) : maxLength || 0
+    console.log(this.maxLength)
     this.actualValue = ''
     this.displayValue = ''
     this.lastKey = null
@@ -26,7 +27,8 @@ export default class inputSpacer {
       return false
     }
 
-    const { actualValue, displayValue, blockSize, delimiterSize, maxLength } = this
+    const { actualValue, displayValue, delimiterSize, maxLength } = this
+    let { blockSize } = this
 
     let reg = new RegExp(delimiter.replace(delimiter, '\\$&'), 'g')
     let val = maxLength !== 0 ? input.replace(reg, '').split('').slice(0, maxLength).join('') : input.replace(reg, '')
@@ -44,13 +46,17 @@ export default class inputSpacer {
     let count = 0
     for (let i in val.split('')) {
       i = parseInt(i)
+      blockSize = this.blockSize.constructor === Array ? this.blockSize[it] || this.blockSize[this.blockSize.length-1] : blockSize
+      let iterableSize = this.blockSize.constructor === Array ? this.blockSize.slice(0, it+1).reduce((p,n)=>p+n) : it * blockSize //Current total of blocks
+      console.log(`${iterableSize} - ${i} - `)
       if (blockSize === count) {
         it++
         count = 0
       }
-      if (i % blockSize === 0 && i !== 0) {
+      if ((iterableSize - i) % blockSize === 0 && i !== 0 && i > iterableSize-1) { 
+        // last check makes sure that a number below the current iterable ( in the case of a block array of [3,1,5]), is not ticked by the modulo operator at the first text
+        // has to wait for the total text length (i) to reach at least to the current total (iterableSize)
         blockedOutput.push(new Array(delimiterSize).fill(delimiter))
-        it++
       }
       if (!blockedOutput[it]) { blockedOutput[it] = [] }
       blockedOutput[it].push(split[i])
