@@ -1,15 +1,20 @@
+const dateFormats = {
+  m: { size: 2, max: 60, min: 0 },
+  h: { size: 2, max: 12, min: 0 }
+}
+
 export default class inputSpacer {
-  constructor (delimiter, delimiterSize = 1, blockSize = 2, maxLength) { 
+  constructor (delimiter, delimiterSize = 1, blockSize = 2, maxLength, blockFormatting = []) {
     this.delimiter = delimiter
     this.delimiterSize = delimiterSize
     this.blockSize = blockSize
-    this.maxLength = blockSize.constructor === Array && !maxLength ? blockSize.reduce((p,n) => p+n) : maxLength || 0
-    console.log(this.maxLength)
+    this.maxLength = blockSize.constructor === Array && !maxLength ? blockSize.reduce((p, n) => p + n) : maxLength || 0
     this.actualValue = ''
     this.displayValue = ''
     this.lastKey = null
     this.selectionStart = null
     this.selectionEnd = null
+    this.blockFormatting = blockFormatting
   }
   setLastKey (key) {
     this.lastKey = key
@@ -19,6 +24,22 @@ export default class inputSpacer {
   }
   setSelectionEnd (end) {
     this.selectionEnd = end
+  }
+  blockFormatter (blockType, blockText, blockFullLength) {
+    let format = dateFormats[blockType]
+    let output = blockText.join('')
+    switch (blockType) {
+      case 'h':
+        let input = parseInt(output)
+        if (isNaN(input)) { return '' }
+        if (input < format.min) {
+          output = format.min
+        }
+        if (input > format.max) {
+          output = format.max
+        }
+    }
+    return String(output).split('')
   }
   spaceInput (input) {
     const { delimiter } = this
@@ -40,29 +61,30 @@ export default class inputSpacer {
         : actualValue.split('').splice(0, actualValue.length - 1).join('')
     }
 
-    let it = 0
+    let it = 0 // Current index of which the blockOutput is being pushed to (incremented by wto because a space array is added)
     let blockedOutput = []
     let split = val.split('')
-    let count = 0
+    let count = 0 // Current index of block being processed from block array
     for (let i in val.split('')) {
       i = parseInt(i)
-      blockSize = this.blockSize.constructor === Array ? this.blockSize[it] || this.blockSize[this.blockSize.length-1] : blockSize
-      let iterableSize = this.blockSize.constructor === Array ? this.blockSize.slice(0, it+1).reduce((p,n)=>p+n) : it * blockSize //Current total of blocks
-      console.log(`${iterableSize} - ${i} - `)
-      if (blockSize === count) {
-        it++
-        count = 0
-      }
-      if ((iterableSize - i) % blockSize === 0 && i !== 0 && i > iterableSize-1) { 
+      blockSize = this.blockSize.constructor === Array ? this.blockSize[count] || this.blockSize[this.blockSize.length - 1] : blockSize
+      let iterableSize = this.blockSize.constructor === Array ? this.blockSize.slice(0, count + 1).reduce((p, n) => p + n) : count * blockSize // Current total of blocks
+
+      if ((iterableSize - i) % blockSize === 0 && i !== 0 && i > iterableSize - 1) {
         // last check makes sure that a number below the current iterable ( in the case of a block array of [3,1,5]), is not ticked by the modulo operator at the first text
         // has to wait for the total text length (i) to reach at least to the current total (iterableSize)
         blockedOutput.push(new Array(delimiterSize).fill(delimiter))
+        console.log(blockedOutput[it])
+        count++
+        it += 2
       }
       if (!blockedOutput[it]) { blockedOutput[it] = [] }
       blockedOutput[it].push(split[i])
-      count++
+      if (this.blockFormatting[count]) { blockedOutput[it] = this.blockFormatter(this.blockFormatting[count], blockedOutput[it]) }
     }
     val = blockedOutput.length === 0 ? '' : blockedOutput.reduce((p, n) => { return p.concat(n) }).join('')
+    this.blocks = blockedOutput
+    this.blocksWithoutDelimiters = blockedOutput.filter((b, i) => b[0] !== delimiter)
     this.actualValue = val.replace(reg, '')
     this.displayValue = val
   }
