@@ -33,8 +33,8 @@ export default class inputSpacer {
   }
   spaceInput (e) {
     const { delimiter } = this.options
+    console.clear()
     this.element = e.target
-
     if (delimiter.charCodeAt(0) === this.lastKey.charCodeAt(0)) { return false }
     if (this.checkDeletingDelimiter() === true) {
       this.setString(this.fixString())
@@ -53,13 +53,17 @@ export default class inputSpacer {
     this.displayValue = this.val
   }
   fixString () {
-    const { lastKey, startSelect } = this
-    const { delimiterSize } = this.options
-    let val = this.val
-    let removeSize = startSelect - (startSelect - delimiterSize - 1)
-    let removeStart = startSelect + (lastKey === 'Backspace' ? -removeSize : 0)
-    val = this.val.split('')
-    val.splice(removeStart, removeSize)
+    const { startSelect } = this
+    let { lastKey } = this
+    const { delimiter, delimiterSize } = this.options
+    lastKey = lastKey.toLowerCase()
+    let directionInformation = cursorMoves[lastKey] ? cursorMoves[lastKey] : cursorMoves.default
+    let removeStart = startSelect + directionInformation.dir
+    let val = this.val.split('')
+    while(val[removeStart] === delimiter ){ 
+      removeStart += directionInformation.dir
+    }
+    val.splice(removeStart, 1)
     return val.join('')
   }
   onKeyDownHandler (e) {
