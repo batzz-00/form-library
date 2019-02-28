@@ -21,17 +21,19 @@ class TimeInput extends React.Component {
     this.actualValue = ''
     this.handleChange = this.handleChange.bind(this)
     this.onKeyDown = this.onKeyDown.bind(this)
-    this.inputSpacer = new InputSpacer(' ', 2, [2, 2], 100, ['h', 'm'])
+    this.input = React.createRef()
+  }
+  componentDidMount(){
+    this.inputSpacer = new InputSpacer({delimiter: ':', delimiterSize:2, maxLength: 6, blockSize: [2, 2, 2], blockFormatting: ['h', 'm', 's']})
   }
   handleChange (e) {
-    this.inputSpacer.spaceInput(e.target.value)
+    e.persist()
+    this.inputSpacer.spaceInput(e)
     // this.inputSpacer.formatBlocks()
-    this.setState({ displayValue: this.inputSpacer.displayValue })
+    this.setState({ displayValue: this.inputSpacer.displayValue }, () => {this.inputSpacer.setCursorPosition(e)})
   }
   onKeyDown (e) {
-    this.inputSpacer.setLastKey(e.key)
-    this.inputSpacer.setSelectionStart(e.target.selectionStart)
-    this.inputSpacer.setSelectionEnd(e.target.selectionEnd)
+    this.inputSpacer.onKeyDownHandler(e)
   }
   render () {
     const { title, name, placeholder, type, errors } = this.props
