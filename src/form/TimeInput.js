@@ -24,12 +24,11 @@ class TimeInput extends React.Component {
     this.input = React.createRef()
   }
   componentDidMount () {
-    this.inputSpacer = new InputSpacer({ delimiter: ':', delimiterSize: 1, maxLength: 6, blockSize: [2, 2, 2], blockFormatting: ['h', 'm', 's'] })
+    this.inputSpacer = new InputSpacer({ delimiter: ' ', delimiterSize: 3, blockSize: [4, 4, 4 ,4], blockFormatting: new Array(4).fill('num')})
   }
   handleChange (e) {
     e.persist()
     this.inputSpacer.spaceInput(e)
-    // this.inputSpacer.formatBlocks()
     this.setState({ displayValue: this.inputSpacer.displayValue }, () => { this.inputSpacer.setCursorPosition(e) })
   }
   onKeyDown (e) {
