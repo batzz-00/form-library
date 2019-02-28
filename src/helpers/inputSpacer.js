@@ -1,16 +1,16 @@
 
-const dateFormats = {
-  m: { size: 2, max: 60, min: 0 }, // minute
-  H: { size: 2, max: 24, min: 0 }, // 24 hour
-  h: { size: 2, max: 12, min: 0 }, // 12 hour
-  s: { size: 2, max: 60, min: 0 },
-  ampm: { options: ['AM', 'PM'] }
-}
+// const dateFormats = {
+//   m: { size: 2, max: 60, min: 0 }, // minute
+//   H: { size: 2, max: 24, min: 0 }, // 24 hour
+//   h: { size: 2, max: 12, min: 0 }, // 12 hour
+//   s: { size: 2, max: 60, min: 0 },
+//   ampm: { options: ['AM', 'PM'] }
+// }
 
-const cursorMoves ={ 
-  backspace: {buffer: -1, dir: -1},
-  delete: {buffer: 0, dir: 1},
-  default: {buffer: 1, dir: 1}
+const cursorMoves = {
+  backspace: { buffer: -1, dir: -1 },
+  delete: { buffer: 0, dir: 1 },
+  default: { buffer: 1, dir: 1 }
 }
 
 export default class inputSpacer {
@@ -32,16 +32,15 @@ export default class inputSpacer {
     }
   }
   spaceInput (e) {
-    const { delimiter, delimiterSize } = this.options
+    const { delimiter } = this.options
     this.element = e.target
 
     if (delimiter.charCodeAt(0) === this.lastKey.charCodeAt(0)) { return false }
-    if (this.checkDeletingDelimiter() === true){
+    if (this.checkDeletingDelimiter() === true) {
       this.setString(this.fixString())
     } else {
       this.setString(e.target.value)
     }
-
 
     this
       .removeDelimiter()
@@ -53,12 +52,12 @@ export default class inputSpacer {
     this.actualValue = this.val
     this.displayValue = this.val
   }
-  fixString(){
-    const { lastKey, startSelect, endSelect } = this
-    const { delimiter, delimiterSize } = this.options
+  fixString () {
+    const { lastKey, startSelect } = this
+    const { delimiterSize } = this.options
     let val = this.val
-    let removeSize = startSelect - (startSelect-delimiterSize-1)
-    let removeStart = startSelect +(lastKey === "Backspace" ? -removeSize : 0)
+    let removeSize = startSelect - (startSelect - delimiterSize - 1)
+    let removeStart = startSelect + (lastKey === 'Backspace' ? -removeSize : 0)
     val = this.val.split('')
     val.splice(removeStart, removeSize)
     return val.join('')
@@ -90,7 +89,6 @@ export default class inputSpacer {
     let { blockSize } = this.options
     const { delimiterSize, delimiter, blockFormatting, maxLength } = this.options
     const immutableBSisze = blockSize
-    console.log(this.val)
     let it = 0 // Current index of which the blockOutput is being pushed to (incremented by wto because a space array is added)
     let blockedOutput = []
     let count = 0 // Current index of block being processed from block array
@@ -106,54 +104,21 @@ export default class inputSpacer {
         count++
         it += 2
       }
-      
+
       if (!blockedOutput[it]) { blockedOutput[it] = { text: [], type: 'text' } }
 
-
       blockedOutput[it].text.push(this.val.substring(i, i + 1))
-
-
-      //// work on this spunk belo witsbunk
-      // if (blockFormatting[count]) {
-      //   let format = this.blockFormatter(blockFormatting[count], blockedOutput[it].text)
-      //   if (format > 1) {
-      //     blockedOutput[it].text = this.blockFormatter(blockFormatting[count], blockedOutput[it].text)
-      //   } else {
-      //     blockedOutput[it].text = this.blockFormatter(blockFormatting[count], blockedOutput[it].text)
-      //   } // FIX THIS
-      // }
+      blockedOutput[it].text = this.blockFormatter(blockFormatting.constructor === Array ? blockFormatting[count] : blockFormatting, blockedOutput[it].text)
     }
-    console.log(blockedOutput)
     this.blocks = blockedOutput
     this.val = blockedOutput
     return this
   }
   blockFormatter (blockType, blockText) {
-    let format = dateFormats[blockType]
-    let output = blockText.join('')
-    let input 
     switch (blockType) {
-      case 'h' :
-      case 'm' :
-      case 's' :
-        let formatBlock = String(format.max).split('')
-        input = parseInt(output)
-        if (isNaN(input)) { return '' }
-        if (input < format.min) {
-          output = format.min
-        }
-        if (input > formatBlock[0] && blockText.length === 1) {
-          this.skipText = 2
-          output = `0${input}`
-        } else if (input > format.max) {
-          output = format.max
-        }
-        break
       case 'num':
-        input = parseInt(output)
-        if(isNaN(input)){ return ''}
-    } // think of best way to implemnt his
-    return String(output).split('')
+        return blockText.filter(b => !isNaN(b))
+    }
   }
   setAffixes () {
     const { suffix, prefix, maxLength } = this.options
@@ -176,53 +141,31 @@ export default class inputSpacer {
     return this
   }
   setCursorPosition () {
-    const { lastKey, startSelect, endSelect } = this
+    const { lastKey, startSelect } = this
     const { delimiter, delimiterSize } = this.options
     const { element } = this
-    let diff = Math.abs(this.val.length - this.oldVal.length)
-    let removeSize = startSelect - (startSelect-diff)
-    let removeStart = startSelect-removeSize
     let cursorBuffer = (cursorMoves[lastKey.toLowerCase()] || cursorMoves['default'])
     let extraBuffer = 0
-    if(this.val[startSelect + cursorBuffer.buffer] === delimiter){
+    if (this.val[startSelect + cursorBuffer.buffer] === delimiter) {
       let curIdx = startSelect + cursorBuffer.buffer
-      while(true){
-        if(this.val[curIdx] !== delimiter || extraBuffer === delimiterSize){
+      while (true) {
+        if (this.val[curIdx] !== delimiter || extraBuffer === delimiterSize) {
           break
         } else {
           curIdx += cursorBuffer.dir
           extraBuffer += cursorBuffer.dir
         }
-        if(curIdx > 100 || curIdx < 0){
-          break // remove after done debugging done to avoid forever wlo
-        }
       }
     }
-    console.log(extraBuffer)
     element.setSelectionRange(startSelect + cursorBuffer.buffer + extraBuffer, startSelect + cursorBuffer.buffer + extraBuffer)
-    // fix react setting cursor pos to end
-    // if (lastKey === 'Backspace') {
-    //   element.setSelectionRange(startSelect - 1, startSelect - 1)
-    // } else if (lastKey === 'Delete') {
-    //   element.setSelectionRange(startSelect, startSelect)
-    // } else if (this.val[startSelect + 1] === delimiter) {
-    //   element.setSelectionRange(startSelect + delimiterSize + diff, startSelect + delimiterSize + diff)
-    // } else if (startSelect !== endSelect) {
-    //   if (this.val[startSelect + 1] === delimiter) {
-    //     element.setSelectionRange(startSelect + 1 + delimiterSize, startSelect + 1 + delimiterSize)
-    //   } else {
-    //     element.setSelectionRange(startSelect + 1, startSelect + 1)
-    //   }
-    // }
   }
   getRawString () {
     return this.rawString
   }
   checkDeletingDelimiter () {
-    const { delimiter, lastKey } = this.options
+    const { delimiter } = this.options
     const { element } = this
-    if(!(this.lastKey === "Backspace" || this.lastKey === "Delete")){return false}
-    console.log('kekek')
+    if (!(this.lastKey === 'Backspace' || this.lastKey === 'Delete')) { return false }
     if (this.val[element.selectionStart] === delimiter) {
       return true
     }
