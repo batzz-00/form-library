@@ -10,8 +10,8 @@
 const cursorMoves = {
   backspace: { buffer: -1, dir: -1, stopAtDelim: true },
   delete: { buffer: 0, dir: 1, stopAtDelim: true },
-  arrowright: { buffer: 1, dir: 1, stopAtDelim: true},
-  arrowleft: { buffer: 1, dir: 1, stopAtDelim: true},
+  arrowright: { buffer: 1, dir: 1, stopAtDelim: true },
+  arrowleft: { buffer: 1, dir: 1, stopAtDelim: true },
   default: { buffer: 1, dir: 1, stopAtDelim: false }
 }
 
@@ -34,6 +34,7 @@ export default class inputSpacer {
     }
   }
   spaceInput (e) {
+    console.clear()
     const { delimiter } = this.options
     this.element = e.target
     if (delimiter.charCodeAt(0) === this.lastKey.charCodeAt(0)) { return false }
@@ -110,7 +111,7 @@ export default class inputSpacer {
     let final = ''
     for (let i = 0; i <= this.val.length - 1;) {
       blockSize = immutableBSize.constructor === Array ? immutableBSize[count] || immutableBSize[immutableBSize.length - 1] : blockSize
-      let valid = this.blockFormatter(blockFormatting.constructor === Array ? blockFormatting[count] : blockFormatting, this.val.substring(count * blockSize, count * blockSize + blockSize))
+      let valid = this.blockFormatter(blockFormatting.constructor === Array ? blockFormatting[count] : blockFormatting, this.val.substring(i, i + blockSize))
       final += valid
       count++
       i += blockSize
@@ -129,15 +130,15 @@ export default class inputSpacer {
   splitIntoBlocks () {
     let { blockSize } = this.options
     const { delimiterSize, delimiter, maxLength } = this.options
-    const immutableBSisze = blockSize
+    const immutableBSize = blockSize
     let it = 0 // Current index of which the blockOutput is being pushed to (incremented by wto because a space array is added)
     let blockedOutput = []
     let count = 0 // Current index of block being processed from block array
     for (let i = 0; i <= this.val.length; i++) {
-      blockSize = immutableBSisze.constructor === Array ? immutableBSisze[count] || immutableBSisze[immutableBSisze.length - 1] : blockSize
-      let iterableSize = immutableBSisze.constructor === Array ? immutableBSisze.slice(0, count + 1).reduce((p, n) => p + n) : count * blockSize // Current total of blocks
-      let finalLength = immutableBSisze.constructor === Array ? immutableBSisze.reduce((p, n) => p + n) : maxLength
-      if ((iterableSize - i) % (blockSize) === 0 && i !== 0 && i > iterableSize - 1 && i !== finalLength) {
+      blockSize = immutableBSize.constructor === Array ? immutableBSize[count] || immutableBSize[immutableBSize.length - 1] : blockSize
+      let iterableSize = immutableBSize.constructor === Array ? immutableBSize.slice(0, count + 1).reduce((p, n) => p + n) : count * blockSize // Current total of blocks
+      let finalLength = immutableBSize.constructor === Array ? maxLength !== 0 ? maxLength : immutableBSize.reduce((p, n) => p + n) : maxLength
+      if ((iterableSize - i) % (blockSize) === 0 && i !== 0 && i !== finalLength) {
         // last check makes sure that a number below the current iterable ( in the case of a block array of [3,1,5]), is not ticked by the modulo operator at the first text
         // has to wait for the total text length (i) to reach at least to the current total (iterableSize)
         blockedOutput.push({ text: new Array(delimiterSize).fill(delimiter), type: 'delimiter' })
@@ -188,7 +189,6 @@ export default class inputSpacer {
     const { element } = this
     let cursorBuffer = (cursorMoves[lastKey.toLowerCase()] || cursorMoves['default'])
     let extraBuffer = 0
-    console.log(startSelect)
     if (this.val[startSelect + cursorBuffer.buffer] === delimiter) {
       let curIdx = startSelect + cursorBuffer.buffer
       while (true) {
@@ -200,7 +200,7 @@ export default class inputSpacer {
         }
       }
       // extraBuffer = cursorBuffer.stopAtDelim ? extraBuffer : extraBuffer + cursorBuffer.dir
-    } 
+    }
     element.setSelectionRange(startSelect + cursorBuffer.buffer + extraBuffer, startSelect + cursorBuffer.buffer + extraBuffer)
   }
   getRawString () {
