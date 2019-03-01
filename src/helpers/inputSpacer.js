@@ -10,6 +10,8 @@
 const cursorMoves = {
   backspace: { buffer: -1, dir: -1, stopAtDelim: true },
   delete: { buffer: 0, dir: 1, stopAtDelim: true },
+  arrowright: { buffer: 1, dir: 1, stopAtDelim: true},
+  arrowleft: { buffer: 1, dir: 1, stopAtDelim: true},
   default: { buffer: 1, dir: 1, stopAtDelim: false }
 }
 
@@ -131,7 +133,7 @@ export default class inputSpacer {
     let it = 0 // Current index of which the blockOutput is being pushed to (incremented by wto because a space array is added)
     let blockedOutput = []
     let count = 0 // Current index of block being processed from block array
-    for (let i = 0; i <= this.val.length - 1; i++) {
+    for (let i = 0; i <= this.val.length; i++) {
       blockSize = immutableBSisze.constructor === Array ? immutableBSisze[count] || immutableBSisze[immutableBSisze.length - 1] : blockSize
       let iterableSize = immutableBSisze.constructor === Array ? immutableBSisze.slice(0, count + 1).reduce((p, n) => p + n) : count * blockSize // Current total of blocks
       let finalLength = immutableBSisze.constructor === Array ? immutableBSisze.reduce((p, n) => p + n) : maxLength
@@ -186,6 +188,7 @@ export default class inputSpacer {
     const { element } = this
     let cursorBuffer = (cursorMoves[lastKey.toLowerCase()] || cursorMoves['default'])
     let extraBuffer = 0
+    console.log(startSelect)
     if (this.val[startSelect + cursorBuffer.buffer] === delimiter) {
       let curIdx = startSelect + cursorBuffer.buffer
       while (true) {
@@ -196,8 +199,8 @@ export default class inputSpacer {
           extraBuffer += cursorBuffer.dir
         }
       }
-    }
-    extraBuffer = cursorBuffer.stopAtDelim ? extraBuffer : extraBuffer + cursorBuffer.dir
+      // extraBuffer = cursorBuffer.stopAtDelim ? extraBuffer : extraBuffer + cursorBuffer.dir
+    } 
     element.setSelectionRange(startSelect + cursorBuffer.buffer + extraBuffer, startSelect + cursorBuffer.buffer + extraBuffer)
   }
   getRawString () {
