@@ -1,11 +1,11 @@
 
-// const dateFormats = {
-//   m: { size: 2, max: 60, min: 0 }, // minute
-//   H: { size: 2, max: 24, min: 0 }, // 24 hour
-//   h: { size: 2, max: 12, min: 0 }, // 12 hour
-//   s: { size: 2, max: 60, min: 0 },
-//   ampm: { options: ['AM', 'PM'] }
-// }
+const dateFormats = {
+  m: { size: 2, max: 60, min: 0 }, // minute
+  H: { size: 2, max: 24, min: 0 }, // 24 hour
+  h: { size: 2, max: 12, min: 0 }, // 12 hour
+  s: { size: 2, max: 60, min: 0 },
+  ampm: { options: ['AM', 'PM'] }
+}
 
 const cursorMoves = {
   backspace: { buffer: -1, dir: -1, stopAtDelim: true },
@@ -20,6 +20,7 @@ export default class inputSpacer {
     this.setOptions(options)
     this.spaceInput = this.spaceInput.bind(this)
     this.val = ''
+    this.displayValue = ''
   }
   setOptions (options) {
     this.options = {
@@ -34,10 +35,8 @@ export default class inputSpacer {
     }
   }
   spaceInput (e) {
-    console.clear()
-    const { delimiter } = this.options
     this.element = e.target
-    if (delimiter.charCodeAt(0) === this.lastKey.charCodeAt(0)) { return false }
+    this.checkInputIsDelimiter()
     if (this.checkDeletingDelimiter() === true) {
       this.setString(this.fixString())
     } else {
@@ -50,9 +49,13 @@ export default class inputSpacer {
       .splitIntoBlocks()
       .setAffixes()
       .turnIntoString()
-
-    this.actualValue = this.val
     this.displayValue = this.val
+  }
+  checkInputIsDelimiter () {
+    const { delimiter } = this.options
+    if (delimiter.charCodeAt(0) === this.lastKey.charCodeAt(0)) {
+      return false
+    }
   }
   fixString () {
     const { startSelect } = this
@@ -71,11 +74,6 @@ export default class inputSpacer {
     this.startSelect = e.target.selectionStart
     this.endSelect = e.target.selectionEnd
     this.checkArrowKeys()
-  }
-  onKeyUpHandler (e) {
-    // this.lastKey = e.key
-    // this.startSelect = e.target.selectionStart
-    // this.endSelect = e.target.selectionEnd
   }
   checkArrowKeys () {
     let { lastKey, startSelect, element, val } = this
@@ -108,10 +106,14 @@ export default class inputSpacer {
     let { blockSize, blockFormatting } = this.options
     const immutableBSize = blockSize
     let count = 0
+    console.clear()
     let final = ''
     for (let i = 0; i <= this.val.length - 1;) {
+      let format = blockFormatting.constructor === Array ? blockFormatting[count] : blockFormatting
+      console.log(`format: ${format} with text ${this.val.substring(i, i + blockSize)}`)
       blockSize = immutableBSize.constructor === Array ? immutableBSize[count] || immutableBSize[immutableBSize.length - 1] : blockSize
-      let valid = this.blockFormatter(blockFormatting.constructor === Array ? blockFormatting[count] : blockFormatting, this.val.substring(i, i + blockSize))
+      let valid = this.blockFormatter(format, this.val.substring(i, i + blockSize))
+
       final += valid
       count++
       i += blockSize
@@ -157,6 +159,26 @@ export default class inputSpacer {
     switch (blockType) {
       case 'num':
         return blockText.split('').filter(b => !isNaN(parseInt(b))).join('')
+      case 'h':
+      case 'm':
+        let format = dateFormats[blockType]
+        if (blockText.length === 1) {
+          if (parseInt(blockText[0]) > parseInt(String(format.max)[0])) {
+            this.pushCursor = 1
+            return '0' + blockText
+          } else if (parseInt(blockText[0]) < format.min) {
+            return format.min
+          } else {
+            return blockText
+          }
+        } else {
+          if (parseInt(blockText) > format.max) {
+            return format.max
+          } else if (parseInt(blockText) > format.min) {
+            return blockText
+          }
+        }
+        return blockText
     }
   }
   setAffixes () {
@@ -197,6 +219,8 @@ export default class inputSpacer {
       }
       // extraBuffer = cursorBuffer.stopAtDelim ? extraBuffer : extraBuffer + cursorBuffer.dir
     }
+    console.log(this.pushCursor)
+    if (this.pushCursor) { extraBuffer += this.pushCursor; this.pushCursor = null }
     element.setSelectionRange(startSelect + cursorBuffer.buffer + extraBuffer, startSelect + cursorBuffer.buffer + extraBuffer)
   }
   getRawString () {

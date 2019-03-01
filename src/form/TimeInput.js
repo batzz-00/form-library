@@ -21,11 +21,10 @@ class TimeInput extends React.Component {
     this.actualValue = ''
     this.handleChange = this.handleChange.bind(this)
     this.onKeyDown = this.onKeyDown.bind(this)
-    this.onKeyUp = this.onKeyUp.bind(this)
     this.input = React.createRef()
   }
   componentDidMount () {
-    this.inputSpacer = new InputSpacer({ delimiter: ' ', delimiterSize: 3, blockSize: [1, 2, 8], maxLength: 50, blockFormatting: 'num' })
+    this.inputSpacer = new InputSpacer({ delimiter: ':', delimiterSize: 1, blockSize: 2, maxLength: 4, blockFormatting: ['h', 'm'] })
   }
   handleChange (e) {
     e.persist()
@@ -34,9 +33,6 @@ class TimeInput extends React.Component {
   }
   onKeyDown (e) {
     this.inputSpacer.onKeyDownHandler(e)
-  }
-  onKeyUp (e) {
-    this.inputSpacer.onKeyUpHandler(e)
   }
   render () {
     const { title, name, placeholder, type, errors } = this.props
