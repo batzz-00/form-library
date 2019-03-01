@@ -147,10 +147,6 @@ export default class inputSpacer {
       }
       if (!blockedOutput[it]) { blockedOutput[it] = { text: [], type: 'text' } }
       blockedOutput[it].text.push(this.val.substring(i, i + 1))
-
-      /// ISSUE CHECKS AFTER TEXT IS ADDED BUT IF TEXT SI FULL AND TEXT IS ADDED IN THE MIDDLE THE LAST CHARACTER OVERFLOWS EVEN IF THE ADDED TEX IS REMOVED
-      /// DUE TO FILTER, CANT CHECK IN BLOCK ADD IF AS IT WONT UPDATE, GOING TO HAVE TO CHECK INDIVIDUAL CHARS BUT THEN HOW CHECK BLOCKS FOR
-      /// MAX TIME LIKE 12
     }
     this.blocks = blockedOutput
     this.val = blockedOutput
