@@ -8,9 +8,9 @@
 // }
 
 const cursorMoves = {
-  backspace: { buffer: -1, dir: -1 },
-  delete: { buffer: 0, dir: 1 },
-  default: { buffer: 1, dir: 1 }
+  backspace: { buffer: -1, dir: -1, stopAtDelim: true },
+  delete: { buffer: 0, dir: 1, stopAtDelim: true },
+  default: { buffer: 1, dir: 1, stopAtDelim: false }
 }
 
 export default class inputSpacer {
@@ -42,6 +42,7 @@ export default class inputSpacer {
     }
     this
       .removeDelimiter()
+      .filterString()
       .setMaxLength()
       .splitIntoBlocks()
       .setAffixes()
@@ -53,12 +54,12 @@ export default class inputSpacer {
   fixString () {
     const { startSelect } = this
     let { lastKey } = this
-    const { delimiter, delimiterSize } = this.options
+    const { delimiter } = this.options
     lastKey = lastKey.toLowerCase()
     let directionInformation = cursorMoves[lastKey] ? cursorMoves[lastKey] : cursorMoves.default
     let removeStart = startSelect + directionInformation.dir
     let val = this.val.split('')
-    while(val[removeStart] === delimiter ){ removeStart += directionInformation.dir }
+    while (val[removeStart] === delimiter) { removeStart += directionInformation.dir }
     val.splice(removeStart, 1)
     return val.join('')
   }
@@ -73,20 +74,20 @@ export default class inputSpacer {
     // this.startSelect = e.target.selectionStart
     // this.endSelect = e.target.selectionEnd
   }
-  checkArrowKeys(){
+  checkArrowKeys () {
     let { lastKey, startSelect, element, val } = this
     const { delimiter } = this.options
     lastKey = lastKey.toLowerCase()
-    if(!(lastKey === "arrowright" || lastKey === "arrowleft")){ return false}
-    let dir = lastKey === "arrowright" ? -1: 0
-    let fix = lastKey === "arrowright" ? 1: -1
-    let actualPos =  startSelect  + fix
-    if(this.val[actualPos+dir] !== delimiter){ return false }
-    while(val[actualPos+fix] === delimiter ){ actualPos += fix}
-    if(lastKey === "arrowright"){ 
+    if (!(lastKey === 'arrowright' || lastKey === 'arrowleft')) { return false }
+    let dir = lastKey === 'arrowright' ? -1 : 0
+    let fix = lastKey === 'arrowright' ? 1 : -1
+    let actualPos = startSelect + fix
+    if (this.val[actualPos + dir] !== delimiter) { return false }
+    while (val[actualPos + fix] === delimiter) { actualPos += fix }
+    if (lastKey === 'arrowright') {
       element.setSelectionRange(actualPos, actualPos)
     } else {
-      element.setSelectionRange(actualPos+1, actualPos+1)
+      element.setSelectionRange(actualPos + 1, actualPos + 1)
     } // More dynamic way to do tihs? idk
   }
   setString (input) {
@@ -100,6 +101,21 @@ export default class inputSpacer {
     this.val = this.val.replace(reg, '')
     return this
   }
+  filterString () {
+    let { blockSize, blockFormatting } = this.options
+    const immutableBSize = blockSize
+    let count = 0
+    let final = ''
+    for (let i = 0; i <= this.val.length - 1;) {
+      blockSize = immutableBSize.constructor === Array ? immutableBSize[count] || immutableBSize[immutableBSize.length - 1] : blockSize
+      let valid = this.blockFormatter(blockFormatting.constructor === Array ? blockFormatting[count] : blockFormatting, this.val.substring(count * blockSize, count * blockSize + blockSize))
+      final += valid
+      count++
+      i += blockSize
+    }
+    this.val = final
+    return this
+  }
   setMaxLength () {
     const { maxLength } = this.options
     if (maxLength !== 0) {
@@ -107,39 +123,41 @@ export default class inputSpacer {
     }
     return this
   }
+
   splitIntoBlocks () {
     let { blockSize } = this.options
-    const { delimiterSize, delimiter, blockFormatting, maxLength } = this.options
+    const { delimiterSize, delimiter, maxLength } = this.options
     const immutableBSisze = blockSize
     let it = 0 // Current index of which the blockOutput is being pushed to (incremented by wto because a space array is added)
     let blockedOutput = []
     let count = 0 // Current index of block being processed from block array
-    // console.log(this.val.length)
-    for (let i = 0; i <= this.val.length; i++) {
+    for (let i = 0; i <= this.val.length - 1; i++) {
       blockSize = immutableBSisze.constructor === Array ? immutableBSisze[count] || immutableBSisze[immutableBSisze.length - 1] : blockSize
       let iterableSize = immutableBSisze.constructor === Array ? immutableBSisze.slice(0, count + 1).reduce((p, n) => p + n) : count * blockSize // Current total of blocks
       let finalLength = immutableBSisze.constructor === Array ? immutableBSisze.reduce((p, n) => p + n) : maxLength
-      if ((iterableSize - i) % blockSize === 0 && i !== 0 && i > iterableSize - 1 && i !== finalLength) {
+      if ((iterableSize - i) % (blockSize) === 0 && i !== 0 && i > iterableSize - 1 && i !== finalLength) {
         // last check makes sure that a number below the current iterable ( in the case of a block array of [3,1,5]), is not ticked by the modulo operator at the first text
         // has to wait for the total text length (i) to reach at least to the current total (iterableSize)
         blockedOutput.push({ text: new Array(delimiterSize).fill(delimiter), type: 'delimiter' })
         count++
         it += 2
       }
-
       if (!blockedOutput[it]) { blockedOutput[it] = { text: [], type: 'text' } }
-
       blockedOutput[it].text.push(this.val.substring(i, i + 1))
-      blockedOutput[it].text = this.blockFormatter(blockFormatting.constructor === Array ? blockFormatting[count] : blockFormatting, blockedOutput[it].text)
+
+      /// ISSUE CHECKS AFTER TEXT IS ADDED BUT IF TEXT SI FULL AND TEXT IS ADDED IN THE MIDDLE THE LAST CHARACTER OVERFLOWS EVEN IF THE ADDED TEX IS REMOVED
+      /// DUE TO FILTER, CANT CHECK IN BLOCK ADD IF AS IT WONT UPDATE, GOING TO HAVE TO CHECK INDIVIDUAL CHARS BUT THEN HOW CHECK BLOCKS FOR
+      /// MAX TIME LIKE 12
     }
     this.blocks = blockedOutput
     this.val = blockedOutput
     return this
   }
   blockFormatter (blockType, blockText) {
+    this.illegal = false
     switch (blockType) {
       case 'num':
-        return blockText.filter(b => !isNaN(b))
+        return blockText.split('').filter(b => !isNaN(parseInt(b))).join('')
     }
   }
   setAffixes () {
@@ -179,6 +197,7 @@ export default class inputSpacer {
         }
       }
     }
+    extraBuffer = cursorBuffer.stopAtDelim ? extraBuffer : extraBuffer + cursorBuffer.dir
     element.setSelectionRange(startSelect + cursorBuffer.buffer + extraBuffer, startSelect + cursorBuffer.buffer + extraBuffer)
   }
   getRawString () {
