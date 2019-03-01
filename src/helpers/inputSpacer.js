@@ -33,7 +33,6 @@ export default class inputSpacer {
   }
   spaceInput (e) {
     const { delimiter } = this.options
-    console.clear()
     this.element = e.target
     if (delimiter.charCodeAt(0) === this.lastKey.charCodeAt(0)) { return false }
     if (this.checkDeletingDelimiter() === true) {
@@ -41,7 +40,6 @@ export default class inputSpacer {
     } else {
       this.setString(e.target.value)
     }
-
     this
       .removeDelimiter()
       .setMaxLength()
@@ -60,9 +58,7 @@ export default class inputSpacer {
     let directionInformation = cursorMoves[lastKey] ? cursorMoves[lastKey] : cursorMoves.default
     let removeStart = startSelect + directionInformation.dir
     let val = this.val.split('')
-    while(val[removeStart] === delimiter ){ 
-      removeStart += directionInformation.dir
-    }
+    while(val[removeStart] === delimiter ){ removeStart += directionInformation.dir }
     val.splice(removeStart, 1)
     return val.join('')
   }
@@ -70,6 +66,28 @@ export default class inputSpacer {
     this.lastKey = e.key
     this.startSelect = e.target.selectionStart
     this.endSelect = e.target.selectionEnd
+    this.checkArrowKeys()
+  }
+  onKeyUpHandler (e) {
+    // this.lastKey = e.key
+    // this.startSelect = e.target.selectionStart
+    // this.endSelect = e.target.selectionEnd
+  }
+  checkArrowKeys(){
+    let { lastKey, startSelect, element, val } = this
+    const { delimiter } = this.options
+    lastKey = lastKey.toLowerCase()
+    if(!(lastKey === "arrowright" || lastKey === "arrowleft")){ return false}
+    let dir = lastKey === "arrowright" ? -1: 0
+    let fix = lastKey === "arrowright" ? 1: -1
+    let actualPos =  startSelect  + fix
+    if(this.val[actualPos+dir] !== delimiter){ return false }
+    while(val[actualPos+fix] === delimiter ){ actualPos += fix}
+    if(lastKey === "arrowright"){ 
+      element.setSelectionRange(actualPos, actualPos)
+    } else {
+      element.setSelectionRange(actualPos+1, actualPos+1)
+    } // More dynamic way to do tihs? idk
   }
   setString (input) {
     this.oldVal = this.val

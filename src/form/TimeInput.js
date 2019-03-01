@@ -21,6 +21,7 @@ class TimeInput extends React.Component {
     this.actualValue = ''
     this.handleChange = this.handleChange.bind(this)
     this.onKeyDown = this.onKeyDown.bind(this)
+    this.onKeyUp = this.onKeyUp.bind(this)
     this.input = React.createRef()
   }
   componentDidMount () {
@@ -34,6 +35,9 @@ class TimeInput extends React.Component {
   onKeyDown (e) {
     this.inputSpacer.onKeyDownHandler(e)
   }
+  onKeyUp (e) {
+    this.inputSpacer.onKeyUpHandler(e)
+  }
   render () {
     const { title, name, placeholder, type, errors } = this.props
     const { displayValue } = this.state
@@ -46,6 +50,7 @@ class TimeInput extends React.Component {
             type={type || 'text'}
             placeholder={placeholder || null}
             onChange={this.handleChange}
+            onKeyUp={this.onKeyUp}
             onKeyDown={this.onKeyDown}
             value={displayValue}
             onBlur={this.props.checkErrors} />
