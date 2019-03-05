@@ -103,7 +103,7 @@ export default class inputSpacer {
     return this
   }
   removeDelimiter () {
-    const { delimiter, blockSize } = this.options
+    const { delimiter, blockSize, delimiterSize } = this.options
     let blocks = blockSize.constructor === Array ? blockSize : [blockSize]
     let delimiters = delimiter.constructor === Array ? delimiter : [delimiter]
 
@@ -113,8 +113,8 @@ export default class inputSpacer {
     this.val = this.val.split('').reduce((acc, n, idx) => {
       let actualIdx = idx - 1
       c = idx === getBlockSize(c) ? c + 1 : c
-      let blockSize = getBlockSize(c)
-      let reg = new RegExp(getDelim(Math.floor((actualIdx/ blockSize))).replace(getDelim(Math.floor(actualIdx/ blockSize)), '\\$&'), 'g')
+      let blockSize = (getBlockSize(c) + delimiterSize)
+      let reg = new RegExp(getDelim(Math.floor((actualIdx/ blockSize))).replace(getDelim(Math.floor(actualIdx / blockSize)), '\\$&'), 'g')
       let newText = n.replace(reg, '')
       return acc + newText
     })
