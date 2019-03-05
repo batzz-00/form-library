@@ -24,7 +24,7 @@ class TimeInput extends React.Component {
     this.input = React.createRef()
   }
   componentDidMount () {
-    this.inputSpacer = new InputSpacer({ delimiter: ':', delimiterSize: 1, blockSize: 2, maxLength: 4, blockFormatting: ['h', 'm'] })
+    this.inputSpacer = new InputSpacer({ delimiter: ' ', delimiterSize: 1, blockSize: [2, 2, 4, 4], blockFormatting: ['h', 'm', 'num', 'num']})
   }
   handleChange (e) {
     e.persist()

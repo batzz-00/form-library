@@ -18,3 +18,5 @@ make it so validator errors can have parameters ?
 have errors on individual parts of the block (123 456 789) where 123 is highlighted for some reason - not possible with css :( 
 
 add time rules on the inputspacer (another helper maybe, could use moment but id rather do it myself)
+
+make return from onSubmit with an optional prop that lets data be returned as formdata instead of object, just ease of use 

@@ -97,6 +97,6 @@ FileUpload.propTypes = {
   checkErrors: PropTypes.func,
   multiple: PropTypes.bool,
   append: PropTypes.bool,
-  handleChange: PropTypes.func,
+  updateInput: PropTypes.func,
   errors: PropTypes.array
 }

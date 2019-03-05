@@ -108,6 +108,9 @@ export default class inputSpacer {
     let count = 0
     console.clear()
     let final = ''
+    if(blockFormatting.length === 0){
+      return this
+    }
     for (let i = 0; i <= this.val.length - 1;) {
       let format = blockFormatting.constructor === Array ? blockFormatting[count] : blockFormatting
       console.log(`format: ${format} with text ${this.val.substring(i, i + blockSize)}`)
@@ -164,7 +167,7 @@ export default class inputSpacer {
         let format = dateFormats[blockType]
         if (blockText.length === 1) {
           if (parseInt(blockText[0]) > parseInt(String(format.max)[0])) {
-            this.pushCursor = 1
+            this.startSelect++
             return '0' + blockText
           } else if (parseInt(blockText[0]) < format.min) {
             return format.min
@@ -207,6 +210,9 @@ export default class inputSpacer {
     const { element } = this
     let cursorBuffer = (cursorMoves[lastKey.toLowerCase()] || cursorMoves['default'])
     let extraBuffer = 0
+    console.log(cursorBuffer)
+    console.log(startSelect)
+    console.log(this.val[startSelect + cursorBuffer.buffer])
     if (this.val[startSelect + cursorBuffer.buffer] === delimiter) {
       let curIdx = startSelect + cursorBuffer.buffer
       while (true) {
@@ -219,7 +225,6 @@ export default class inputSpacer {
       }
       // extraBuffer = cursorBuffer.stopAtDelim ? extraBuffer : extraBuffer + cursorBuffer.dir
     }
-    console.log(this.pushCursor)
     if (this.pushCursor) { extraBuffer += this.pushCursor; this.pushCursor = null }
     element.setSelectionRange(startSelect + cursorBuffer.buffer + extraBuffer, startSelect + cursorBuffer.buffer + extraBuffer)
   }
