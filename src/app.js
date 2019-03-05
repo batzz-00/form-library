@@ -25,7 +25,7 @@ export default class App extends React.Component {
           <Form onSubmit={this.onSubmit}>
             <Textbox title='Name' name='rat' required />
             <TextArea title='rara' name='rata' required />
-            <TimeInput />
+            <TimeInput title='time' name='time' required />
             <FileUpload title='File Upload' name='files' multiple required maxFiles={10} maxSize={1024} />
             <Submit value='Submit' />
           </Form>

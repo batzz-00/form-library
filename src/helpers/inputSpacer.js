@@ -52,7 +52,13 @@ export default class inputSpacer {
     this.displayValue = this.val
   }
   checkInputIsDelimiter () {
-    const { delimiter } = this.options
+    const { blockSize, delimiterSize } = this.options
+    let { delimiter } = this.options
+    let curBlockSize = (blockSize.constructor === Array ? blockSize.filter((b, i) => blockSize.slice(0, i + 1).reduce((p, n) => p + n + delimiterSize, 0) >= this.val.length) : blockSize)
+    delimiter = delimiter.constructor === Array ? delimiter[blockSize.length - curBlockSize.length] || delimiter[delimiter.length - 1] : delimiter
+    // need to make it so that above works with single blocksize and single delimter
+    // fix replace so that it doesnt replace delimiters when putting it stuff into other blocks that have separate delimiters
+    console.log(delimiter)
     if (delimiter.charCodeAt(0) === this.lastKey.charCodeAt(0)) {
       return false
     }
@@ -97,24 +103,48 @@ export default class inputSpacer {
     return this
   }
   removeDelimiter () {
-    const { delimiter } = this.options
-    let reg = new RegExp(delimiter.replace(delimiter, '\\$&'), 'g')
-    this.val = this.val.replace(reg, '')
+    const { delimiter, blockSize, delimiterSize } = this.options
+    if (delimiter.constructor === Array) {
+      let string = ''
+      let totalBlockSize = 0
+      // let valStr = ''
+      for (let d in delimiter) {
+        let curDelimiter = delimiter[d]
+        let currentBlockSize = blockSize.constructor === Array ? blockSize[d] || null : blockSize// if null dont do naything
+        let reg = new RegExp(curDelimiter.replace(curDelimiter, '\\$&'), 'g')
+        let checkedString = this.val.substring(totalBlockSize, totalBlockSize + currentBlockSize + delimiterSize + 1)
+        console.log(`checking string: ${checkedString} for reg ${reg}`)
+
+        // fix this substring bunk
+        string += checkedString.replace(reg, '')
+        totalBlockSize += currentBlockSize + delimiterSize + 1
+        if (totalBlockSize > this.val.length) {
+          break
+        }
+      }
+
+      this.val = string
+    } else {
+      let reg = new RegExp(delimiter.replace(delimiter, '\\$&'), 'g')
+      this.val = this.val.replace(reg, '')
+    }
     return this
   }
   filterString () {
     let { blockSize, blockFormatting } = this.options
     const immutableBSize = blockSize
     let count = 0
-    console.clear()
     let final = ''
-    if(blockFormatting.length === 0){
+    if (blockFormatting.length === 0) {
       return this
     }
     for (let i = 0; i <= this.val.length - 1;) {
-      let format = blockFormatting.constructor === Array ? blockFormatting[count] : blockFormatting
-      console.log(`format: ${format} with text ${this.val.substring(i, i + blockSize)}`)
+      let format = blockFormatting.constructor === Array ? blockFormatting[count] || null : blockFormatting
       blockSize = immutableBSize.constructor === Array ? immutableBSize[count] || immutableBSize[immutableBSize.length - 1] : blockSize
+      if (!format) {
+        final += this.val.substring(i, i + blockSize)
+        break
+      }
       let valid = this.blockFormatter(format, this.val.substring(i, i + blockSize))
 
       final += valid
@@ -143,10 +173,11 @@ export default class inputSpacer {
       blockSize = immutableBSize.constructor === Array ? immutableBSize[count] || immutableBSize[immutableBSize.length - 1] : blockSize
       let iterableSize = immutableBSize.constructor === Array ? immutableBSize.slice(0, count + 1).reduce((p, n) => p + n) : count * blockSize // Current total of blocks
       let finalLength = immutableBSize.constructor === Array ? maxLength !== 0 ? maxLength : immutableBSize.reduce((p, n) => p + n) : maxLength
+      let actualDelimiter = delimiter.constructor === Array ? delimiter[count] || delimiter[delimiter.length - 1] : delimiter
       if ((iterableSize - i) % (blockSize) === 0 && i !== 0 && i !== finalLength) {
         // last check makes sure that a number below the current iterable ( in the case of a block array of [3,1,5]), is not ticked by the modulo operator at the first text
         // has to wait for the total text length (i) to reach at least to the current total (iterableSize)
-        blockedOutput.push({ text: new Array(delimiterSize).fill(delimiter), type: 'delimiter' })
+        blockedOutput.push({ text: new Array(delimiterSize).fill(actualDelimiter), type: 'delimiter' })
         count++
         it += 2
       }
@@ -206,13 +237,13 @@ export default class inputSpacer {
   }
   setCursorPosition () {
     const { lastKey, startSelect } = this
-    const { delimiter, delimiterSize } = this.options
+    let { delimiter, delimiterSize, blockSize } = this.options
     const { element } = this
     let cursorBuffer = (cursorMoves[lastKey.toLowerCase()] || cursorMoves['default'])
     let extraBuffer = 0
-    console.log(cursorBuffer)
-    console.log(startSelect)
-    console.log(this.val[startSelect + cursorBuffer.buffer])
+    let curBlockSize = (blockSize.constructor === Array ? blockSize.filter((b, i) => blockSize.slice(0, i + 1).reduce((p, n) => p + n + delimiterSize, 0) >= this.val.length) : blockSize)
+    delimiter = delimiter.constructor === Array ? delimiter[blockSize.length - curBlockSize.length] || delimiter[delimiter.length - 1] : delimiter
+    // need to make it so that above works with single blocksize and single delimter
     if (this.val[startSelect + cursorBuffer.buffer] === delimiter) {
       let curIdx = startSelect + cursorBuffer.buffer
       while (true) {
