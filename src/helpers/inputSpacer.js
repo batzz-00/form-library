@@ -103,21 +103,21 @@ export default class inputSpacer {
     return this
   }
   removeDelimiter () {
-    const { delimiter, blockSize, delimiterSize } = this.options
+    const { delimiter, blockSize } = this.options
     let blocks = blockSize.constructor === Array ? blockSize : [blockSize]
     let delimiters = delimiter.constructor === Array ? delimiter : [delimiter]
 
-    let getDelim = (i) => delimiters[i] || delimiters[delimiters.length-1]
-    let getBlockSize = (i) => blocks[i] || blocks[blocks.length-1]
+    let getDelim = (i) => delimiters[i] || delimiters[delimiters.length - 1]
+    let getBlockSize = (i) => blocks[i] || blocks[blocks.length - 1]
     let c = 0
-    this.val = this.val.split('').reduce((acc, n, idx)=>{
-      let actualIdx = idx-1
-      c = idx === getBlockSize(c) ? c+1 : c 
+    this.val = this.val.split('').reduce((acc, n, idx) => {
+      let actualIdx = idx - 1
+      c = idx === getBlockSize(c) ? c + 1 : c
       let blockSize = getBlockSize(c)
-      let reg = new RegExp(getDelim(Math.floor(((actualIdx-1)/blockSize))).replace(getDelim(Math.floor((actualIdx-1)/blockSize)), '\\$&'), 'g')
+      let reg = new RegExp(getDelim(Math.floor((actualIdx/ blockSize))).replace(getDelim(Math.floor(actualIdx/ blockSize)), '\\$&'), 'g')
       let newText = n.replace(reg, '')
       return acc + newText
-    }) 
+    })
     return this
   }
   filterString () {
