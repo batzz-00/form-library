@@ -104,30 +104,20 @@ export default class inputSpacer {
   }
   removeDelimiter () {
     const { delimiter, blockSize, delimiterSize } = this.options
-    if (delimiter.constructor === Array) {
-      let string = ''
-      let totalBlockSize = 0
-      // let valStr = ''
-      for (let d in delimiter) {
-        let curDelimiter = delimiter[d]
-        let currentBlockSize = blockSize.constructor === Array ? blockSize[d] || null : blockSize// if null dont do naything
-        let reg = new RegExp(curDelimiter.replace(curDelimiter, '\\$&'), 'g')
-        let checkedString = this.val.substring(totalBlockSize, totalBlockSize + currentBlockSize + delimiterSize + 1)
-        console.log(`checking string: ${checkedString} for reg ${reg}`)
+    let blocks = blockSize.constructor === Array ? blockSize : [blockSize]
+    let delimiters = delimiter.constructor === Array ? delimiter : [delimiter]
 
-        // fix this substring bunk
-        string += checkedString.replace(reg, '')
-        totalBlockSize += currentBlockSize + delimiterSize + 1
-        if (totalBlockSize > this.val.length) {
-          break
-        }
-      }
-
-      this.val = string
-    } else {
-      let reg = new RegExp(delimiter.replace(delimiter, '\\$&'), 'g')
-      this.val = this.val.replace(reg, '')
-    }
+    let getDelim = (i) => delimiters[i] || delimiters[delimiters.length-1]
+    let getBlockSize = (i) => blocks[i] || blocks[blocks.length-1]
+    let c = 0
+    this.val = this.val.split('').reduce((acc, n, idx)=>{
+      let actualIdx = idx-1
+      c = idx === getBlockSize(c) ? c+1 : c 
+      let blockSize = getBlockSize(c)
+      let reg = new RegExp(getDelim(Math.floor(((actualIdx-1)/blockSize))).replace(getDelim(Math.floor((actualIdx-1)/blockSize)), '\\$&'), 'g')
+      let newText = n.replace(reg, '')
+      return acc + newText
+    }) 
     return this
   }
   filterString () {
