@@ -114,7 +114,7 @@ export default class inputSpacer {
       let actualIdx = idx - 1
       c = idx === getBlockSize(c) ? c + 1 : c
       let blockSize = (getBlockSize(c) + delimiterSize)
-      let reg = new RegExp(getDelim(Math.floor((actualIdx/ blockSize))).replace(getDelim(Math.floor(actualIdx / blockSize)), '\\$&'), 'g')
+      let reg = new RegExp(getDelim(Math.floor((actualIdx / blockSize))).replace(getDelim(Math.floor(actualIdx / blockSize)), '\\$&'), 'g')
       let newText = n.replace(reg, '')
       return acc + newText
     })
@@ -133,7 +133,9 @@ export default class inputSpacer {
       blockSize = immutableBSize.constructor === Array ? immutableBSize[count] || immutableBSize[immutableBSize.length - 1] : blockSize
       if (!format) {
         final += this.val.substring(i, i + blockSize)
-        break
+        count++
+        i += blockSize
+        continue
       }
       let valid = this.blockFormatter(format, this.val.substring(i, i + blockSize))
 
@@ -141,6 +143,8 @@ export default class inputSpacer {
       count++
       i += blockSize
     }
+    console.log(final)
+    console.log(this.val)
     this.val = final
     return this
   }
@@ -232,10 +236,10 @@ export default class inputSpacer {
     let cursorBuffer = (cursorMoves[lastKey.toLowerCase()] || cursorMoves['default'])
     let extraBuffer = 0
     let curBlockSize = (blockSize.constructor === Array ? blockSize.filter((b, i) => blockSize.slice(0, i + 1).reduce((p, n) => p + n + delimiterSize, 0) <= this.val.length)
-        : new Array(Math.floor(this.val.length / (blockSize+delimiterSize))))
-    
+      : new Array(Math.floor(this.val.length / (blockSize + delimiterSize))))
+
     delimiter = delimiter.constructor === Array ? delimiter[curBlockSize.length - 1] || delimiter[delimiter.length - 1] : delimiter
-    
+
     if (this.val[startSelect + cursorBuffer.buffer] === delimiter) {
       let curIdx = startSelect + cursorBuffer.buffer
       while (true) {
