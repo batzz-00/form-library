@@ -73,12 +73,15 @@ export default class inputSpacer {
   fixString () {
     const { startSelect } = this
     let { lastKey } = this
-    const { delimiter } = this.options
+    let { delimiter, blockSize, delimiterSize } = this.options
+    let curBlockSize = (blockSize.constructor === Array ? blockSize.filter((b, i) => blockSize.slice(0, i + 1).reduce((p, n) => p + n + delimiterSize, 0) >= this.val.length) : blockSize)
+    delimiter = delimiter.constructor === Array ? delimiter[blockSize.length - curBlockSize.length] || delimiter[delimiter.length - 1] : delimiter
+    delimiter = delimiter.constructor === Array ? delimiter : [delimiter] 
     lastKey = lastKey.toLowerCase()
     let directionInformation = cursorMoves[lastKey] ? cursorMoves[lastKey] : cursorMoves.default
     let removeStart = startSelect + directionInformation.dir
     let val = this.val.split('')
-    while (val[removeStart] === delimiter) { removeStart += directionInformation.dir }
+    while (delimiter.includes(val[removeStart])) { console.log('eh');removeStart += directionInformation.dir }
     val.splice(removeStart, 1)
     return val.join('')
   }
@@ -124,7 +127,7 @@ export default class inputSpacer {
       let reg = new RegExp(getDelim(Math.floor((actualIdx / blockSize))).replace(getDelim(Math.floor(actualIdx / blockSize)), '\\$&'), 'g')
       let newText = n.replace(reg, '')
       return acc + newText
-    })
+    }, '')
     return this
   }
   removeAffixes () {
@@ -135,7 +138,6 @@ export default class inputSpacer {
     if (prefix) {
       this.val = this.val.replace(prefix, '')
     }
-    console.log(this.val)
     return this
   }
   filterString () {
@@ -273,10 +275,10 @@ export default class inputSpacer {
     return this.rawString
   }
   checkDeletingDelimiter () {
-    const { delimiter } = this.options
+    let { delimiter } = this.options
     const { element } = this
-    if (!(this.lastKey === 'Backspace' || this.lastKey === 'Delete')) { return false }
-    if (this.val[element.selectionStart] === delimiter) {
+    delimiter = delimiter.constructor === Array ? delimiter : [delimiter] 
+    if (delimiter.includes(this.val[element.selectionStart])) {
       return true
     }
   }
