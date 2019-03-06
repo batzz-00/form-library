@@ -76,12 +76,12 @@ export default class inputSpacer {
     let { delimiter, blockSize, delimiterSize } = this.options
     let curBlockSize = (blockSize.constructor === Array ? blockSize.filter((b, i) => blockSize.slice(0, i + 1).reduce((p, n) => p + n + delimiterSize, 0) >= this.val.length) : blockSize)
     delimiter = delimiter.constructor === Array ? delimiter[blockSize.length - curBlockSize.length] || delimiter[delimiter.length - 1] : delimiter
-    delimiter = delimiter.constructor === Array ? delimiter : [delimiter] 
+    delimiter = delimiter.constructor === Array ? delimiter : [delimiter]
     lastKey = lastKey.toLowerCase()
     let directionInformation = cursorMoves[lastKey] ? cursorMoves[lastKey] : cursorMoves.default
     let removeStart = startSelect + directionInformation.dir
     let val = this.val.split('')
-    while (delimiter.includes(val[removeStart])) { console.log('eh');removeStart += directionInformation.dir }
+    while (delimiter.includes(val[removeStart])) { console.log('eh'); removeStart += directionInformation.dir }
     val.splice(removeStart, 1)
     return val.join('')
   }
@@ -136,7 +136,7 @@ export default class inputSpacer {
       this.val = this.val.replace(suffix, '')
     }
     if (prefix) {
-      this.val = this.val.replace(prefix, '')
+      this.val = this.val.substr(prefix.length, this.val.length)
     }
     return this
   }
@@ -206,7 +206,8 @@ export default class inputSpacer {
         return blockText.split('').filter(b => !isNaN(parseInt(b))).join('')
       case 'h':
       case 'm':
-        let format = dateFormats[blockType]
+        let format = dateFormats[blockType] 
+        blockText = blockText.split('').reduce((p, n) => p + (isNaN(parseInt(n)) ? '': n), '') // remove all non number characters
         if (blockText.length === 1) {
           if (parseInt(blockText[0]) > parseInt(String(format.max)[0])) {
             this.startSelect++
@@ -277,7 +278,7 @@ export default class inputSpacer {
   checkDeletingDelimiter () {
     let { delimiter } = this.options
     const { element } = this
-    delimiter = delimiter.constructor === Array ? delimiter : [delimiter] 
+    delimiter = delimiter.constructor === Array ? delimiter : [delimiter]
     if (delimiter.includes(this.val[element.selectionStart])) {
       return true
     }
