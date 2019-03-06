@@ -21,6 +21,7 @@ export default class inputSpacer {
     this.spaceInput = this.spaceInput.bind(this)
     this.val = ''
     this.displayValue = ''
+    this.setup()
   }
   setOptions (options) {
     this.options = {
@@ -34,6 +35,12 @@ export default class inputSpacer {
       ...options
     }
   }
+  setup () {
+    this
+      .setAffixes()
+      .turnIntoString()
+    this.displayValue = this.val
+  }
   spaceInput (e) {
     this.element = e.target
     this.checkInputIsDelimiter()
@@ -43,7 +50,8 @@ export default class inputSpacer {
       this.setString(e.target.value)
     }
     this
-      .removeDelimiter()
+      .removeAffixes()
+      .removeDelimiters()
       .filterString()
       .setMaxLength()
       .splitIntoBlocks()
@@ -58,7 +66,6 @@ export default class inputSpacer {
     delimiter = delimiter.constructor === Array ? delimiter[blockSize.length - curBlockSize.length] || delimiter[delimiter.length - 1] : delimiter
     // need to make it so that above works with single blocksize and single delimter
     // fix replace so that it doesnt replace delimiters when putting it stuff into other blocks that have separate delimiters
-    console.log(delimiter)
     if (delimiter.charCodeAt(0) === this.lastKey.charCodeAt(0)) {
       return false
     }
@@ -102,7 +109,7 @@ export default class inputSpacer {
     this.val = input
     return this
   }
-  removeDelimiter () {
+  removeDelimiters () {
     const { delimiter, blockSize, delimiterSize } = this.options
     let blocks = blockSize.constructor === Array ? blockSize : [blockSize]
     let delimiters = delimiter.constructor === Array ? delimiter : [delimiter]
@@ -118,6 +125,17 @@ export default class inputSpacer {
       let newText = n.replace(reg, '')
       return acc + newText
     })
+    return this
+  }
+  removeAffixes () {
+    const { suffix, prefix } = this.options
+    if (suffix) {
+      this.val = this.val.replace(suffix, '')
+    }
+    if (prefix) {
+      this.val = this.val.replace(prefix, '')
+    }
+    console.log(this.val)
     return this
   }
   filterString () {
@@ -138,13 +156,10 @@ export default class inputSpacer {
         continue
       }
       let valid = this.blockFormatter(format, this.val.substring(i, i + blockSize))
-
       final += valid
       count++
       i += blockSize
     }
-    console.log(final)
-    console.log(this.val)
     this.val = final
     return this
   }
@@ -231,15 +246,14 @@ export default class inputSpacer {
   }
   setCursorPosition () {
     const { lastKey, startSelect } = this
-    let { delimiter, delimiterSize, blockSize } = this.options
+    let { delimiter, delimiterSize, blockSize, prefix } = this.options
     const { element } = this
     let cursorBuffer = (cursorMoves[lastKey.toLowerCase()] || cursorMoves['default'])
     let extraBuffer = 0
     let curBlockSize = (blockSize.constructor === Array ? blockSize.filter((b, i) => blockSize.slice(0, i + 1).reduce((p, n) => p + n + delimiterSize, 0) <= this.val.length)
       : new Array(Math.floor(this.val.length / (blockSize + delimiterSize))))
-
+    extraBuffer = prefix ? prefix.length : extraBuffer
     delimiter = delimiter.constructor === Array ? delimiter[curBlockSize.length - 1] || delimiter[delimiter.length - 1] : delimiter
-
     if (this.val[startSelect + cursorBuffer.buffer] === delimiter) {
       let curIdx = startSelect + cursorBuffer.buffer
       while (true) {
