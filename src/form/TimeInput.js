@@ -25,8 +25,7 @@ class TimeInput extends React.Component {
   }
   componentDidMount () {
     const { format } = this.props
-    console.log(format)
-    this.inputSpacer = new InputSpacer({ delimiter: [' ', '-', '.'], delimiterSize: 1, blockSize: 2, blockFormatting: ['num', 'num', 'num'] })
+    this.inputSpacer = new InputSpacer({ delimiter: '.', delimiterSize: 1, blockSize: [2,3,4], blockFormatting: ['num', 'num', 'num'] })
   }
   handleChange (e) {
     e.persist()
