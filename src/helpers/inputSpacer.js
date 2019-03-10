@@ -1,9 +1,12 @@
 
 const dateFormats = {
-  m: { size: 2, max: 60, min: 0 }, // minute
+  M: { size: 2, max: 60, min: 0 }, // minute
   H: { size: 2, max: 24, min: 0 }, // 24 hour
   h: { size: 2, max: 12, min: 0 }, // 12 hour
   s: { size: 2, max: 60, min: 0 },
+  d: { size: 2, max: 12, min: 0 }, // day
+  m: { size: 2, max: 12, min: 0 }, // month
+  y: { size: 2, max: 60, min: 0 }, // year
   ampm: { options: ['AM', 'PM'] }
 }
 
@@ -206,8 +209,8 @@ export default class inputSpacer {
         return blockText.split('').filter(b => !isNaN(parseInt(b))).join('')
       case 'h':
       case 'm':
-        let format = dateFormats[blockType] 
-        blockText = blockText.split('').reduce((p, n) => p + (isNaN(parseInt(n)) ? '': n), '') // remove all non number characters
+        let format = dateFormats[blockType]
+        blockText = blockText.split('').reduce((p, n) => p + (isNaN(parseInt(n)) ? '' : n), '') // remove all non number characters
         if (blockText.length === 1) {
           if (parseInt(blockText[0]) > parseInt(String(format.max)[0])) {
             this.startSelect++

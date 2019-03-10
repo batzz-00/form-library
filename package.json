@@ -8,7 +8,8 @@
     "serve": "nodemon serve.js",
     "buildDev": "webpack --mode development --watch --config ./config/webpack.dev.config.js",
     "lint": "eslint . --ext .js,.jsx",
-    "lintFix": "eslint . --ext .js,.jsx --fix"
+    "lintFix": "eslint . --ext .js,.jsx --fix",
+    "test": "jest"
   },
   "author": "",
   "license": "ISC",
@@ -46,9 +47,12 @@
     "webpack-cli": "^3.1.2"
   },
   "dependencies": {
+    "babel-jest": "^24.1.0",
+    "input-spacer": "^1.1.1",
     "prop-types": "^15.6.2",
     "react": "^16.5.2",
-    "react-dom": "^16.5.2"
+    "react-dom": "^16.5.2",
+    "react-test-renderer": "^16.8.4"
   },
   "eslintConfig": {
     "extends": [
@@ -60,6 +64,9 @@
       "localStorage": true,
       "FileReader": true,
       "Image": true
+    },
+    "env": {
+      "jest": true
     }
   },
   "babel": {

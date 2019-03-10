@@ -25,14 +25,18 @@ export default class Form extends React.Component {
     this.addError = this.addError.bind(this)
   }
   addError (name, errors) {
-    this.errors[name] = errors
+    if (errors.length === 0 && this.errors[name]) {
+      delete this.errors[name]
+    } else if (errors.length !== 0) {
+      this.errors[name] = errors
+    }
   }
   async onSubmit (e) {
     e.preventDefault()
     let valid = await this.error()
     if (!valid) {
       if (this.props.onError) {
-        this.props.onError(Object.keys(this.inputs).filter(e => this.inputs[e].required === true && this.inputs[e].value === ''))
+        this.props.onError(this.errors)
       }
       return false
     }
@@ -49,7 +53,7 @@ export default class Form extends React.Component {
     })
 
     return Promise.all(promises).then((result) => {
-      if (result.map(error => !error).length > 0) {
+      if (result.filter(error => !error).length > 0) {
         return false
       } else {
         return true
