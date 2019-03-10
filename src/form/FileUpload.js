@@ -31,6 +31,9 @@ class FileUpload extends React.Component {
     }
     this.fileInput.current.click()
   }
+  componentDidMount () {
+    // this.props.loadRef(this.fileInput)
+  }
   handleChange () {
     let colours = ['#2980b9', '#27ae60', '#16a085', '#d35400', '#c0392b']
     let actualFiles = this.props.append ? this.state.files : []
@@ -60,7 +63,7 @@ class FileUpload extends React.Component {
         <div className={'input' + (errors ? ' error' : '')}>
           {title ? <h1>{title + (errors ? ' - Errors' : '')}</h1> : null}
           <input
-            ref={this.fileInput}
+            ref={(ref) => { this.fileInput = ref; this.props.loadRef(ref) }}
             name={name || null}
             type='file'
             onChange={this.handleChange}
@@ -97,6 +100,7 @@ FileUpload.propTypes = {
   checkErrors: PropTypes.func,
   multiple: PropTypes.bool,
   append: PropTypes.bool,
+  loadRef: PropTypes.func,
   errors: PropTypes.array,
   handleChange: PropTypes.func
 }

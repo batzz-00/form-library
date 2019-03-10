@@ -45,7 +45,7 @@ export default class Select extends React.Component {
     })
   }
   render () {
-    const { title, name, placeholder } = this.props
+    const { title, name, placeholder, loadRef } = this.props
     let { options } = this.props
     const { chosen, errors, value } = this.state
     if (typeof options[0] !== 'object') {
@@ -59,6 +59,7 @@ export default class Select extends React.Component {
             name={name || null}
             placeholder={placeholder || null}
             value={value || chosen || ''}
+            ref={loadRef}
             onChange={(e) => this.handleChange(e, 'select')}>
             {options.map((option, i) => {
               return (<option value={option.actualValue} key={i}>{option.shownValue}</option>)
@@ -74,6 +75,7 @@ Select.propTypes = {
   options: PropTypes.array.isRequired,
   title: PropTypes.string,
   placeholder: PropTypes.string,
+  loadRef: PropTypes.string,
   chosen: PropTypes.string,
   name: PropTypes.string,
   updateInput: PropTypes.func,

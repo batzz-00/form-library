@@ -4,7 +4,7 @@ import PropTypes from 'prop-types'
 import Validator from '../helpers/validator'
 
 export const withHandler = (WrappedComponent, allowedRules = null, defaultValue) => {
-  class Component extends React.Component {
+  class Component extends WrappedComponent {
     constructor (props) {
       super(props)
       // Initial state
@@ -13,6 +13,7 @@ export const withHandler = (WrappedComponent, allowedRules = null, defaultValue)
       // Bindings
       this.handleChange = this.handleChange.bind(this)
       this.checkErrors = this.checkErrors.bind(this)
+      this.loadRef = this.loadRef.bind(this)
 
       // timer to detect last change was x abgo
       this.changing = false
@@ -56,6 +57,11 @@ export const withHandler = (WrappedComponent, allowedRules = null, defaultValue)
         clearInterval(this.afterTimer)
       }
     }
+    loadRef (ref) {
+      if (this.props.innerRef) {
+        this.props.innerRef(ref)
+      }
+    }
     // move to withErrors?
     checkErrors () {
       const { customErrors } = this.props
@@ -73,7 +79,7 @@ export const withHandler = (WrappedComponent, allowedRules = null, defaultValue)
       })
     }
     render () {
-      return (<WrappedComponent handleChange={this.handleChange} defaultValue={this.props.defaultValue} checkErrors={this.checkErrors} errors={this.state.errors} {...this.props} />)
+      return (<WrappedComponent loadRef={this.loadRef} handleChange={this.handleChange} defaultValue={this.props.defaultValue} checkErrors={this.checkErrors} errors={this.state.errors} {...this.props} />)
     }
   }
   Component.displayName = `withHandler.${getDisplayName(WrappedComponent)}`

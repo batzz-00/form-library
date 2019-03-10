@@ -15,7 +15,6 @@ class TextBox extends React.Component {
   constructor (props) {
     super(props)
     this.state = { errors: null, value: '' }
-
     this.handleChange = this.handleChange.bind(this)
   }
   handleChange (e) {
@@ -23,7 +22,7 @@ class TextBox extends React.Component {
     this.props.handleChange(this.props.name, val) // ERROR CATCH FOR SAME KEY
   }
   render () {
-    const { title, name, placeholder, value, type, errors } = this.props
+    const { title, name, placeholder, value, type, errors, loadRef } = this.props
     return (
       <div className='input-wrapper'>
         <div className={'input' + (errors ? ' error' : '')}>
@@ -34,6 +33,7 @@ class TextBox extends React.Component {
             placeholder={placeholder || null}
             defaultValue={value || null}
             onChange={this.handleChange}
+            ref={loadRef}
             onBlur={this.props.checkErrors} />
         </div>
         {errors
@@ -52,6 +52,7 @@ TextBox.propTypes = {
   name: PropTypes.string,
   value: PropTypes.string,
   type: PropTypes.string,
+  loadRef: PropTypes.func,
   handleChange: PropTypes.func,
   errors: PropTypes.array,
   checkErrors: PropTypes.func

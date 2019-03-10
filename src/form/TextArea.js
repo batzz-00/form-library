@@ -19,7 +19,7 @@ class TextArea extends React.Component {
     this.props.handleChange(this.props.name, val) // ERROR CATCH FOR SAME KEY
   }
   render () {
-    const { title, value, name, placeholder, errors } = this.props
+    const { title, value, name, placeholder, errors, loadRef } = this.props
     return (
       <div className='input-wrapper'>
         <div className={'input' + (errors ? ' error' : '')}>
@@ -29,6 +29,7 @@ class TextArea extends React.Component {
             onChange={(e) => this.handleChange(e)}
             defaultValue={value || ''}
             placeholder={placeholder || null}
+            ref={loadRef}
           />
         </div>
         {errors
@@ -45,6 +46,7 @@ TextArea.propTypes = {
   title: PropTypes.string,
   placeholder: PropTypes.string,
   name: PropTypes.string,
+  loadRef: PropTypes.func,
   value: PropTypes.string,
   handleChange: PropTypes.func,
   errors: PropTypes.array
